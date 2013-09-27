@@ -1,4 +1,6 @@
 
+import pdb
+
 import subprocess
 import re
 
@@ -63,7 +65,6 @@ class _RpcFactory(object):
 
     return rpc_e
 
-
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
 ###
@@ -107,7 +108,6 @@ class _RpcMetaExec(object):
       # don't know what to do, so raise an exception
       raise AttributeError, "Cannot process method %s" % method
 
-
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
 ###
@@ -130,6 +130,8 @@ class _RpcHelpers(object):
     self._helper_fntbl[method] = method_fn
     return method_fn
 
+  add = set       # alias    
+
   def load( self, helpers ):    
     for method, method_fn in helpers.items():
       self.set( method, method_fn )
@@ -140,11 +142,18 @@ class _RpcHelpers(object):
       helpers and return the function if found.  otherwise raise
       an AttributeError exception
     """
-    method_fn = self.get( method )
+    method_fn = self._helper_fntbl[method]
     if not method_fn: raise AttributeErrror, "Unknown helper: %s" % method
     def _helper_fn(*vargs, **kvargs):
       return method_fn(self._wlc, vargs, **kvargs)
     return _helper_fn
+
+  def __iadd__(self, other):
+    if callable(other):
+      self.set( other.__name__, other)
+      return self
+    else:
+      raise ValueError, "not callable: %s" % other.__name__
 
 ### ---------------------------------------------------------------------------
 ### builtin RPC helpers
@@ -310,5 +319,3 @@ class JuniperWirelessLanController(object):
     # the action response; i.e. the first child
 
     return rsp_e[0] if len(rsp_e) else rsp_e
-
-
