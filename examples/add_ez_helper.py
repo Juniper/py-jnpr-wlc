@@ -1,3 +1,4 @@
+import pdb
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
@@ -15,6 +16,7 @@ def system_services( wlc, *vargs, **kvargs ):
     single/returned dictionary
   """
 
+  pdb.set_trace()
   run_list = {
     'sshd': wlc.rpc.get_sshd,
     'httpd': wlc.rpc.get_httpd,
@@ -46,4 +48,11 @@ si = wlc.ez.system_services()
 
 print "System Services:"
 pp(si)
+
+# and you could do things like:
+# >>> [svc for svc in si.keys() if si[svc]['enabled'] == "YES"]
+# ['httpd', 'sshd', 'telnetd']
+# >>> [svc for svc in si.keys() if si[svc]['enabled'] != "YES"]
+# ['tftpd']
+
 

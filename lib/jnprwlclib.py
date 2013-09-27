@@ -142,8 +142,9 @@ class _RpcHelpers(object):
       helpers and return the function if found.  otherwise raise
       an AttributeError exception
     """
-    method_fn = self._helper_fntbl[method]
+    method_fn = self.get(method)
     if not method_fn: raise AttributeErrror, "Unknown helper: %s" % method
+    
     def _helper_fn(*vargs, **kvargs):
       return method_fn(self._wlc, vargs, **kvargs)
     return _helper_fn
