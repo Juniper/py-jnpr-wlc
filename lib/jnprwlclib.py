@@ -51,6 +51,18 @@ class _RpcFactory(object):
 
     return rpc_e
 
+  def Action(self, action, *vargs, **kvargs):
+    rpc_e = self.Next();
+    trans_e = etree.SubElement(rpc_e,"ACT")
+    act_e = etree.SubElement(trans_e, action.upper())
+
+    # add any attributes from kvargs to the action
+    for k,v in kvargs.items(): 
+      k = re.sub('_','-',k)
+      act_e.attrib[k] = v
+
+    return rpc_e
+
   def GetStat(self, target, *vargs, **kvargs ):
     """
       ACTION: GET-STAT
@@ -86,23 +98,31 @@ class _RpcMetaExec(object):
   def get_stat(self, target, *vargs, **kvargs ):
     rpc_cmd = self._factory.GetStat( target, vargs, **kvargs )
     return self._wlc( rpc_cmd )
+
+  def action( self, target, *vargs, **kvargs):
+    rpc_cmd = self._factory.Action( target, vargs, **kvargs)
+    return self._wlc( rpc_cmd )
     
   def __getattr__(self, method ):
     """
       metaprograms 'GET' 
       metaprograms 'GET-STAT'
+      metaprograms 'ACT'
     """
     if method.startswith('get_stat_'):
-
       x,x,target = method.partition('get_stat_')
       target = re.sub('_','-',target)
       return lambda *v,**kv: self.get_stat( target, v, **kv )      
 
     elif method.startswith('get_'):
-
       x,x,target = method.partition('get_')
       target = re.sub('_','-',target)
       return lambda *v,**kv: self.get( target, v, **kv )      
+
+    elif method.startswith('act_'):
+      x,x,target = method.partition('act_')
+      target = re.sub('_','-',target)
+      return lambda *v,**kv: self.action( target, v, **kv )      
 
     else:      
       # don't know what to do, so raise an exception
@@ -144,7 +164,7 @@ class _RpcHelpers(object):
     """
     method_fn = self.get(method)
     if not method_fn: raise AttributeErrror, "Unknown helper: %s" % method
-    
+
     def _helper_fn(*vargs, **kvargs):
       return method_fn(self._wlc, vargs, **kvargs)
     return _helper_fn
