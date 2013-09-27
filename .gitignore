@@ -1,5 +1,8 @@
 *.py[cod]
 
+# XML files
+*.xml
+
 # C extensions
 *.so
 
@@ -19,7 +22,7 @@ env
 
 # Installer logs
 pip-log.txt
-
+#
 # Unit test / coverage reports
 .coverage
 .tox

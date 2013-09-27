@@ -14,27 +14,35 @@ from urllib2 import HTTPError
 import base64
 from lxml import etree
 
+### ---------------------------------------------------------------------------
+### ===========================================================================
+###
+### _RpcFactory
+###
+### ===========================================================================
+### ---------------------------------------------------------------------------
+
 class _RpcFactory(object):
-  HELLO = """
+  NEW_TRANS = """
     <TRANSACTION tid="0">
     <SESSION/>
     </TRANSACTION>
   """
   def __init__( self, wlc ):
-    self._wlc = wlc
     self._tid = 1
+    self._wlc = wlc       # not used, but keeping tabs on it, just in case
 
-  def next(self):
-    rpc_e = etree.XML( self.__class__.HELLO)
+  def Next(self):
+    rpc_e = etree.XML( self.__class__.NEW_TRANS)
     rpc_e.attrib['tid'] = str(self._tid)
     self._tid += 1
     return rpc_e
 
-  def get(self, target, *vargs, **kvargs ):
+  def Get(self, target, *vargs, **kvargs ):
     """
       ACTION: GET
     """
-    rpc_e = self.next()
+    rpc_e = self.Next()
     get_e = etree.SubElement(rpc_e, "GET")
     get_e.attrib['level'] = 'all'
     target_e = etree.SubElement( get_e, target.upper() )    
@@ -45,11 +53,11 @@ class _RpcFactory(object):
 
     return rpc_e
 
-  def get_stat(self, target, *vargs, **kvargs ):
+  def GetStat(self, target, *vargs, **kvargs ):
     """
       ACTION: GET-STAT
     """
-    rpc_e = self.next()
+    rpc_e = self.Next()
     get_e = etree.SubElement(rpc_e, "GET-STAT")
     target_e = etree.SubElement( get_e, target.upper() )    
 
@@ -59,42 +67,124 @@ class _RpcFactory(object):
 
     return rpc_e
 
+
+### ---------------------------------------------------------------------------
+### ===========================================================================
+###
+### _RpcMetaExec
+###
+### ===========================================================================
+### ---------------------------------------------------------------------------
+
+class _RpcMetaExec(object):
+
+  def __init__(self, wlc, factory ):
+    self._wlc = wlc
+    self._factory = factory
+
+  def get(self, target, *vargs, **kvargs ):
+    rpc_cmd = self._factory.Get( target, vargs, **kvargs )
+    return self._wlc( rpc_cmd )
+
+  def get_stat(self, target, *vargs, **kvargs ):
+    rpc_cmd = self._factory.GetStat( target, vargs, **kvargs )
+    return self._wlc( rpc_cmd )
+    
+  def __getattr__(self, method ):
+    """
+      metaprograms 'GET' 
+      metaprograms 'GET-STAT'
+    """
+    if method.startswith('get_stat_'):
+
+      x,x,target = method.partition('get_stat_')
+      target = re.sub('_','-',target)
+      return lambda *v,**kv: self.get_stat( target, v, **kv )      
+
+    elif method.startswith('get_'):
+
+      x,x,target = method.partition('get_')
+      target = re.sub('_','-',target)
+      return lambda *v,**kv: self.get( target, v, **kv )      
+
+    else:      
+      # don't know what to do, so raise an exception
+      raise AttributeError, "Cannot process method %s" % method
+
+
+### ---------------------------------------------------------------------------
+### ===========================================================================
+###
+### _RpcHelpers
+###
+### ===========================================================================
+### ---------------------------------------------------------------------------
+
 class _RpcHelpers(object):
 
-  def __init__(self, wlc ):
+  def __init__(self, wlc, load_helpers=None ):
     self._wlc = wlc
     self._helper_fntbl = {}
+    if load_helpers: self.load( load_helpers )
 
   def get(self, method):
-    if method in self._helper_fntbl:
-      return self._helper_fntbl[method]
-    return False
+    return self._helper_fntbl.get( method, False)
 
   def set(self, method, method_fn):
     self._helper_fntbl[method] = method_fn
     return method_fn
 
+  def load( self, helpers ):    
+    for method, method_fn in helpers.items():
+      self.set( method, method_fn )
+
+  def __getattr__( self, method ):
+    """
+      implements "method_missing", so perform a lookup in the known
+      helpers and return the function if found.  otherwise raise
+      an AttributeError exception
+    """
+    method_fn = self.get( method )
+    if not method_fn: raise AttributeErrror, "Unknown helper: %s" % method
+    def _helper_fn(*vargs, **kvargs):
+      return method_fn(self._wlc, vargs, **kvargs)
+    return _helper_fn
+
 ### ---------------------------------------------------------------------------
 ### builtin RPC helpers
 ### ---------------------------------------------------------------------------
 
-def _wlc_version(self, *vargs, **kvargs):
+def _wlc_system(wlc, *vargs, **kvargs):
   """
-    return a merged dict of BOOTSTATUS and SYSTEMSTATUS information
+    return a merged dict of the following:
+    - BOOTSTATUS 
+    - SYSTEMSTATUS
+    - SYSTEMGLOBAL
+
+    wlc: WLC object
   """
-  bs_rpc_rsp = self.rpc(self._rpc.get('bootstatus'))
-  ss_rpc_rsp = self.rpc(self._rpc.get('systemstatus'))
+
+  run_list = [ wlc.rpc.get_bootstatus,
+               wlc.rpc.get_systemstatus,
+               wlc.rpc.get_systemglobal ]
+
   data = {}
-  data.update(bs_rpc_rsp[0].attrib)
-  data.update(ss_rpc_rsp[0].attrib)
+  for rpc in run_list:
+    rsp = rpc()                   
+    data.update(rsp[0].attrib)    # values are in the XML attributes
+
   return data
 
 _builtin_rpc_helpers = {
-  'version': _wlc_version
+  'system': _wlc_system
 }
 
 ### ---------------------------------------------------------------------------
-### primary class for managing WLC devices
+### ===========================================================================
+###
+### JuniperWirelessLanController
+###
+### ===========================================================================
 ### ---------------------------------------------------------------------------
 
 class JuniperWirelessLanController(object):
@@ -102,6 +192,7 @@ class JuniperWirelessLanController(object):
   DEFAULT_HTTP = 'https'
   DEFAULT_PORT = 8889
   DEFAULT_API_URI = "/trapeze/ringmaster"
+  DEFAULT_API_USER_AGENT = 'Juniper Networks RingMaster'
   DEFAULT_TIMEOUT = 3
 
   @property
@@ -125,7 +216,6 @@ class JuniperWirelessLanController(object):
   def password(self, value):
       self._password = value
 
-
   def __init__(self, *vargs, **kvargs):
     _rqd_args = 'host user password'.split()
 
@@ -143,11 +233,9 @@ class JuniperWirelessLanController(object):
     self._proto = kvargs.get('http', self.__class__.DEFAULT_HTTP)
     self._timeout = kvargs.get('timeout', self.__class__.DEFAULT_TIMEOUT)
 
-    self._rpc = _RpcFactory( self )
-    self._rpc_helpers = _RpcHelpers( self )
-
-    for method, method_fn in _builtin_rpc_helpers.items():
-      self._rpc_helpers.set( method, method_fn )
+    self._rpc_factory = _RpcFactory(self)
+    self.rpc = _RpcMetaExec(self, self._rpc_factory)
+    self.ez = _RpcHelpers(self, load_helpers=_builtin_rpc_helpers)
 
   def _setup_http(self):
 
@@ -185,8 +273,8 @@ class JuniperWirelessLanController(object):
     # if there is an issue communicating to the WLC, then
     # this action will raise an exception (urllib2)
 
-    rpc_cmd = self._rpc.next()
-    rpc_rsp = self.rpc( rpc_cmd )
+    rpc_cmd = self._rpc_factory.Next()
+    rpc_rsp = self.__call__( rpc_cmd )
 
     return True if rpc_rsp.attrib['nerrors'] == "0" else False
 
@@ -194,77 +282,37 @@ class JuniperWirelessLanController(object):
 
   def close(self):
     """
-      doesn't do anything ... for now.
+      close doesn't do anything ... for now.
     """
     return True
 
-  def rpc( self, rpc_data ):
+  def __call__( self, rpc_cmd ):
     """
-      transmits RPC command and returns back the RPC result as etree Element
+      executes RPC command (rpc_cmd) and returns back the RPC result.
+      The result in the form of an etree Element
 
-      rpc_data - can be either raw XML as string, or etree Element
+      rpc_cmd: can be in one of two forms:
+      - str: fully formulated WLC raw XML as string
+      - etree._Element: built from the _RpcFactory 
     """
+
     req = Request( self._api_uri )
-    req.add_header('User-Agent', 'Juniper Networks RingMaster')         
+    req.add_header('User-Agent', self.__class__.DEFAULT_API_USER_AGENT)         
     req.add_header("Authorization", "Basic %s" % self._auth_base64)
 
-    if isinstance(rpc_data, str):
-      req.add_data('XML=' + rpc_data )
-    elif isinstance(rpc_data, etree._Element):
-      req.add_data('XML=' + etree.tostring( rpc_data ))
+    if isinstance(rpc_cmd, str):
+      req.add_data('XML=' + rpc_cmd )
+    elif isinstance(rpc_cmd, etree._Element):
+      req.add_data('XML=' + etree.tostring( rpc_cmd ))
 
     rsp_e = etree.XML(self._http_api.open(req).read())
 
     # @@@ should do common error checking here
-    # return the XML element starting with the top of
+    # @@@ TBD ...
+
+    # now return the XML element starting with the top of
     # the action response; i.e. the first child
 
     return rsp_e[0] if len(rsp_e) else rsp_e
-
-  ### -------------------------------------------------------------------------
-  ###
-  ### Methods to implement XML RPC invocations
-  ###
-  ### -------------------------------------------------------------------------
-
-  def add_rpc_helper( self, method, method_fn ):
-    return self._rpc_helpers.set( method, method_fn )
-
-  def get(self, target, *vargs, **kvargs ):
-    rpc_cmd = self._rpc.get( target, vargs, **kvargs )
-    return self.rpc( rpc_cmd )
-
-  def get_stat(self, target, *vargs, **kvargs ):
-    rpc_cmd = self._rpc.get_stat( target, vargs, **kvargs )
-    return self.rpc( rpc_cmd )
-    
-  def __getattr__(self, method ):
-    """
-      metaprograms 'GET' 
-      metaprograms 'GET-STAT'
-    """
-    if method.startswith('get_stat_'):
-
-      x,x,target = method.partition('get_stat_')
-      target = re.sub('_','-',target)
-      return lambda *v,**kv: self.get_stat( target, v, **kv )      
-
-    elif method.startswith('get_'):
-
-      x,x,target = method.partition('get_')
-      target = re.sub('_','-',target)
-      return lambda *v,**kv: self.get( target, v, **kv )      
-
-    else:
-
-      # see if there is a helper_rpc for this method call
-      fn_helper = self._rpc_helpers.get(method)
-      if fn_helper: 
-        def _call_helper( *vargs, **kvargs):
-          return fn_helper(self, vargs, **kvargs)
-        return _call_helper
-
-      # don't know what to do, so raise an exception
-      raise AttributeError, "Cannot process method %s" % method
 
 
