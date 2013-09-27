@@ -4,8 +4,6 @@ from pprint import pprint as pp
 
 wlc = WLC_login()
 
-import pdb
-
 ### - add the 'system_services' as an "ez" helper function
 
 def system_services( wlc, *vargs, **kvargs ):

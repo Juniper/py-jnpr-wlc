@@ -149,9 +149,18 @@ class _RpcHelpers(object):
     return _helper_fn
 
   def __iadd__(self, other):
+    """
+       meta way to add new ez helpers rather than calling the
+       set method
+    """
     if callable(other):
+      # other is a single callable item
       self.set( other.__name__, other)
       return self
+    #
+    # @@@ todo: add the ability to provide a list of 
+    # @@@ callable items
+    #
     else:
       raise ValueError, "not callable: %s" % other.__name__
 
