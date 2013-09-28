@@ -245,6 +245,27 @@ _builtin_rpc_helpers = {
 ### ---------------------------------------------------------------------------
 
 class JuniperWirelessLanController(object):
+  """
+    Main class to manage a Juniper Wireless Lan Controller (WLC) product
+
+    Public READ-WRITE properties:
+    - user: str, username accessing the WLC    
+    - hostname: str, hostname of the WLC
+    - timeout: int, time in seconds to call timeout on reaching the  WLC
+
+    Public READ-ONLY properties:
+    - password: str, password to access the WLC
+
+    Public READ-ONLY attributes
+    - rpc: used to meta execute RPCs to the WLC
+
+    Public methods:
+    - open: 'opens' a connection to the WLC, i.e. verifies reachability and
+            user/passowrd values
+
+    
+
+  """
 
   DEFAULT_HTTP = 'https'
   DEFAULT_PORT = 8889
