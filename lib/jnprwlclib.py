@@ -145,20 +145,18 @@ class _RpcHelpers(object):
   def __init__(self, wlc, load_helpers=None ):
     self._wlc = wlc
     self._helper_fntbl = {}
-    if load_helpers: self.load( load_helpers )
+    if load_helpers: self.Load( load_helpers )
 
-  def get(self, method):
+  def Get(self, method):
     return self._helper_fntbl.get( method, False)
 
-  def set(self, method, method_fn):
+  def Set(self, method, method_fn):
     self._helper_fntbl[method] = method_fn
     return method_fn
 
-  add = set       # alias    
-
-  def load( self, helpers ):    
+  def Load( self, helpers ):    
     for method, method_fn in helpers.items():
-      self.set( method, method_fn )
+      self.Set( method, method_fn )
 
   def __getattr__( self, method ):
     """
@@ -166,7 +164,7 @@ class _RpcHelpers(object):
       helpers and return the function if found.  otherwise raise
       an AttributeError exception
     """
-    method_fn = self.get(method)
+    method_fn = self.Get(method)
     if not method_fn: 
       def _no_method_fn(*vargs, **kvargs):
         raise AttributeError("Unknown ez helper: '%s'" % method)
@@ -200,7 +198,7 @@ class _RpcHelpers(object):
 
     if callable( new_helper ):
       # other is a single callable item
-      self.set( new_name, new_helper)
+      self.Set( new_name, new_helper)
       return self
     #
     # @@@ todo: add the ability to provide a list of 
