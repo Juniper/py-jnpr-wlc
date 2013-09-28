@@ -16,7 +16,6 @@ def system_services( wlc, *vargs, **kvargs ):
     single/returned dictionary
   """
 
-  pdb.set_trace()
   run_list = {
     'sshd': wlc.rpc.get_sshd,
     'httpd': wlc.rpc.get_httpd,
@@ -38,7 +37,7 @@ def system_services( wlc, *vargs, **kvargs ):
 
 # add this new routine to the WLC "ez" section.
 
-wlc.ez += system_services
+wlc.ez( system_services )
 
 # now call the service
 

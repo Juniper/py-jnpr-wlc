@@ -21,6 +21,7 @@ from lxml import etree
 ### ---------------------------------------------------------------------------
 
 class _RpcFactory(object):
+
   NEW_TRANS = """
     <TRANSACTION tid="0">
     <SESSION/>
@@ -38,7 +39,7 @@ class _RpcFactory(object):
 
   def Get(self, target, *vargs, **kvargs ):
     """
-      ACTION: GET
+      transcation: GET
     """
     rpc_e = self.Next()
     get_e = etree.SubElement(rpc_e, "GET")
@@ -52,6 +53,9 @@ class _RpcFactory(object):
     return rpc_e
 
   def Action(self, action, *vargs, **kvargs):
+    """
+      transaction: ACT
+    """
     rpc_e = self.Next();
     trans_e = etree.SubElement(rpc_e,"ACT")
     act_e = etree.SubElement(trans_e, action.upper())
@@ -65,7 +69,7 @@ class _RpcFactory(object):
 
   def GetStat(self, target, *vargs, **kvargs ):
     """
-      ACTION: GET-STAT
+      transaction: GET-STAT
     """
     rpc_e = self.Next()
     get_e = etree.SubElement(rpc_e, "GET-STAT")
@@ -169,14 +173,16 @@ class _RpcHelpers(object):
       return method_fn(self._wlc, vargs, **kvargs)
     return _helper_fn
 
-  def __iadd__(self, other):
+  def __call__(self, *vargs, **kvargs ):
     """
        meta way to add new ez helpers rather than calling the
        set method
     """
-    if callable(other):
+    pdb.set_trace()
+    new_helper = vargs[0]
+    if callable( new_helper ):
       # other is a single callable item
-      self.set( other.__name__, other)
+      self.set( new_helper.__name__, new_helper)
       return self
     #
     # @@@ todo: add the ability to provide a list of 
