@@ -178,7 +178,6 @@ class _RpcHelpers(object):
        meta way to add new ez helpers rather than calling the
        set method
     """
-    pdb.set_trace()
     new_helper = vargs[0]
     if callable( new_helper ):
       # other is a single callable item
