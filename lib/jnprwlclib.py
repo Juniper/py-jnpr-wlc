@@ -177,7 +177,7 @@ class _RpcHelpers(object):
   def __call__(self, *vargs, **kvargs ):
     """
        meta way to add new ez helpers rather than calling the
-       set method.  Using __call__ as the means to add new
+       Set method.  Using __call__ as the means to add new
        helpers provides a number of options:
 
        ez( <function> ):
