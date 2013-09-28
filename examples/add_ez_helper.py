@@ -40,7 +40,7 @@ def system_services( wlc, *vargs, **kvargs ):
 wlc.ez( system_services )
 
 # now call the service
-
+print "Retrieving System Services ..."
 si = wlc.ez.system_services()
 
 # now show the info:

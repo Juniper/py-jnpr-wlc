@@ -167,7 +167,10 @@ class _RpcHelpers(object):
       an AttributeError exception
     """
     method_fn = self.get(method)
-    if not method_fn: raise AttributeErrror, "Unknown helper: %s" % method
+    if not method_fn: 
+      def _no_method_fn(*vargs, **kvargs):
+        raise AttributeError("Unknown ez helper: '%s'" % method)
+      return _no_method_fn
 
     def _helper_fn(*vargs, **kvargs):
       return method_fn(self._wlc, vargs, **kvargs)
@@ -176,12 +179,28 @@ class _RpcHelpers(object):
   def __call__(self, *vargs, **kvargs ):
     """
        meta way to add new ez helpers rather than calling the
-       set method
+       set method.  Using __call__ as the means to add new
+       helpers provides a number of options:
+
+       ez( <function> ):
+          This will simply add the function to the ez
+          helpers table.  Assumes that <function>.__name__
+          is usable for later invocations, i.e. its not a lambda
+
+        ez( <function>, name=<name> ):
+          Similar to the above, but allows the name option to
+          set the name of the ez function rather than taking
+          it from <function>.__name__
+
     """
+
     new_helper = vargs[0]
+    new_name = new_helper.__name__
+    if 'name' in kvargs: new_name = kvargs['name']
+
     if callable( new_helper ):
       # other is a single callable item
-      self.set( new_helper.__name__, new_helper)
+      self.set( new_name, new_helper)
       return self
     #
     # @@@ todo: add the ability to provide a list of 
