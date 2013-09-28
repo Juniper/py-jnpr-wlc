@@ -135,12 +135,12 @@ class _RpcMetaExec(object):
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
 ###
-### _RpcHelpers
+### RpcHelper
 ###
 ### ===========================================================================
 ### ---------------------------------------------------------------------------
 
-class _RpcHelpers(object):
+class RpcHelper(object):
 
   def __init__(self, wlc, load_helpers=None ):
     self._wlc = wlc
@@ -248,22 +248,34 @@ class JuniperWirelessLanController(object):
   """
     Main class to manage a Juniper Wireless Lan Controller (WLC) product
 
-    Public READ-WRITE properties:
+    ----------------------------
+    Public READ-WRITE properties
+    ----------------------------
     - user: str, username accessing the WLC    
+
     - hostname: str, hostname of the WLC
+
     - timeout: int, time in seconds to call timeout on reaching the  WLC
 
-    Public READ-ONLY properties:
+    ---------------------------
+    Public READ-ONLY properties
+    ---------------------------
     - password: str, password to access the WLC
 
+    ---------------------------
     Public READ-ONLY attributes
+    ---------------------------
     - rpc: used to meta execute RPCs to the WLC
 
-    Public methods:
+    --------------
+    Public methods
+    --------------
     - open: 'opens' a connection to the WLC, i.e. verifies reachability and
             user/passowrd values
 
-    
+    - close: 'closes' a connection to the WLC.  currently doesn't do anything
+
+    - (rpc_cmd): using a WLC object in a call executes the provided RPC
 
   """
 
@@ -313,7 +325,7 @@ class JuniperWirelessLanController(object):
 
     self._rpc_factory = _RpcFactory(self)
     self.rpc = _RpcMetaExec(self, self._rpc_factory)
-    self.ez = _RpcHelpers(self, load_helpers=_builtin_rpc_helpers)
+    self.ez = RpcHelper(self, load_helpers=_builtin_rpc_helpers)
 
   def _setup_http(self):
 
