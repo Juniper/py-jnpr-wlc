@@ -10,6 +10,7 @@ from urllib2 import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPD
 from urllib2 import HTTPHandler, HTTPSHandler, build_opener
 from urllib2 import HTTPError
 import base64
+
 from lxml import etree
 
 ### ---------------------------------------------------------------------------
@@ -52,6 +53,36 @@ class _RpcFactory(object):
 
     return rpc_e
 
+
+  def GetStat(self, target, *vargs, **kvargs ):
+    """
+      transaction: GET-STAT
+    """
+    rpc_e = self.Next()
+    trans_e = etree.SubElement(rpc_e, "GET-STAT")
+    target_e = etree.SubElement( trans_e, target.upper() )    
+
+    if kvargs:  # kvargs is the <key>=<value> for a unique object
+      key, value = next(kvargs.iteritems())
+      target_e.attrib[key] = str(value)
+
+    return rpc_e
+
+  def Delete(self, target, *vargs, **kvargs ):
+    """
+      transaction: ACT+DELETE
+    """
+    rpc_e = self.Next()
+    trans_e = etree.SubElement(rpc_e, 'ACT')
+    del_e = etree.SubElement(trans_e, 'DELETE')
+    target_e = etree.SubElement( del_e, target.upper() )    
+
+    if kvargs:  # kvargs is the <key>=<value> for a unique object
+      key, value = next(kvargs.iteritems())
+      target_e.attrib[key] = str(value)
+
+    return rpc_e
+
   def Action(self, action, *vargs, **kvargs):
     """
       transaction: ACT
@@ -65,21 +96,7 @@ class _RpcFactory(object):
       k = re.sub('_','-',k)
       act_e.attrib[k] = v
 
-    return rpc_e
-
-  def GetStat(self, target, *vargs, **kvargs ):
-    """
-      transaction: GET-STAT
-    """
-    rpc_e = self.Next()
-    get_e = etree.SubElement(rpc_e, "GET-STAT")
-    target_e = etree.SubElement( get_e, target.upper() )    
-
-    if kvargs:  # kvargs is the <key>=<value> for a unique object
-      key, value = next(kvargs.iteritems())
-      target_e.attrib[key] = str(value)
-
-    return rpc_e
+    return rpc_e    
 
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
@@ -97,21 +114,33 @@ class _RpcMetaExec(object):
 
   def get(self, target, *vargs, **kvargs ):
     rpc_cmd = self._factory.Get( target, vargs, **kvargs )
-    return self._wlc( rpc_cmd )
+    return self( rpc_cmd )
 
   def get_stat(self, target, *vargs, **kvargs ):
     rpc_cmd = self._factory.GetStat( target, vargs, **kvargs )
-    return self._wlc( rpc_cmd )
+    return self( rpc_cmd )
+
+  def delete(self, target, *vargs, **kvargs ):
+    rpc_cmd = self._factory.Delete( target, vargs, **kvargs )
+    return self( rpc_cmd )    
 
   def action( self, target, *vargs, **kvargs):
     rpc_cmd = self._factory.Action( target, vargs, **kvargs)
-    return self._wlc( rpc_cmd )
+    return self( rpc_cmd )
     
+  def __call__(self, rpc_cmd):
+    """
+    invoking this object as a fuction executes the rpc_cmd on
+    the associated WLC
+    """
+    return self._wlc.execute( rpc_cmd )
+
   def __getattr__(self, method ):
     """
       metaprograms 'GET' 
       metaprograms 'GET-STAT'
       metaprograms 'ACT'
+      metaprograms 'DELETE'
     """
     if method.startswith('get_stat_'):
       x,x,target = method.partition('get_stat_')
@@ -127,6 +156,11 @@ class _RpcMetaExec(object):
       x,x,target = method.partition('act_')
       target = re.sub('_','-',target)
       return lambda *v,**kv: self.action( target, v, **kv )      
+
+    elif method.startswith('delete_'):
+      x,x,target = method.partition('delete_')
+      target = re.sub('_','-',target)
+      return lambda *v,**kv: self.delete( target, v, **kv )      
 
     else:      
       # don't know what to do, so raise an exception
@@ -270,12 +304,12 @@ class JuniperWirelessLanController(object):
     --------------
     Public methods
     --------------
-    - open: 'opens' a connection to the WLC, i.e. verifies reachability and
-            user/passowrd values
+    - open: 'opens' a connection to the WLC
+            verifies reachability(ping) and user/passowrd values
 
     - close: 'closes' a connection to the WLC.  currently doesn't do anything
 
-    - (rpc_cmd): using a WLC object in a call executes the provided RPC
+    - execute: executes an RPC command and returns the response
 
   """
 
@@ -343,6 +377,17 @@ class JuniperWirelessLanController(object):
     self._http_api = build_opener(auth_hndlr, https_hndlr, http_hndlr)
     self._auth_base64 = base64.encodestring('%s:%s' % (self._user, self._password))[:-1]          
 
+  def _ping_test(self):
+    """
+      attempts to ping the WLC device.  This only works on Unix systems that 
+      has /bin/ping
+    """
+    ping = subprocess.Popen(
+      ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
+      stdout=subprocess.PIPE) 
+    if 0 != ping.wait():
+      raise RuntimeError("Unable to ping host: " + self._hostname)
+
   def open(self):
     """
       open is used to setup the HTTP/s process and verify connectivity and user 
@@ -350,13 +395,7 @@ class JuniperWirelessLanController(object):
     """
 
     self._setup_http()
-
-    # first do a quick ping and see if the device is reachable
-    ping = subprocess.Popen(
-      ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
-      stdout=subprocess.PIPE) 
-    if 0 != ping.wait():
-      raise RuntimeError("Unable to ping host: " + self._hostname)
+    self._ping_test()
 
     # clear to send the HTTP command and see what comes back
     # return True if the response contains no errors.
@@ -364,7 +403,7 @@ class JuniperWirelessLanController(object):
     # this action will raise an exception (urllib2)
 
     rpc_cmd = self._rpc_factory.Next()
-    rpc_rsp = self.__call__( rpc_cmd )
+    rpc_rsp = self.execute( rpc_cmd )
 
     return True if rpc_rsp.attrib['nerrors'] == "0" else False
 
@@ -376,7 +415,7 @@ class JuniperWirelessLanController(object):
     """
     return True
 
-  def __call__( self, rpc_cmd ):
+  def execute( self, rpc_cmd ):
     """
       executes RPC command (rpc_cmd) and returns back the RPC result.
       The result in the form of an etree Element

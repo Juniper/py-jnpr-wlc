@@ -6,10 +6,20 @@ from lxml.builder import E
 
 wlc = WLC_login()
 
+### -----------------------------------------------------------------
+### The following builds an XML for the VLAN-TABLE and assocaited
+### sub elements and attributes.  THe technique here is using the
+### lxml module ElementMaker object.  For details on this process
+### refer to: http://lxml.de/tutorial.html#the-e-factory
+### -----------------------------------------------------------------
+
+# use a SET transaction to perform the create
+
 set_trans = E.TRANSACTION({'tid': '0'},
   E.SESSION,
-  E.SET
-  )
+  E.SET)
+
+# create the VLAN-TABLE element
 
 add_vlan_ele = E('VLAN-TABLE',
   E.VLAN({'number': '100', 'name': 'Jeremy', 'state': 'ACTIVE', 'tunnel-affinity': '5'},
@@ -39,5 +49,5 @@ set_trans.find('SET').append( add_vlan_ele )
 
 # now perform the transaction
 
-r = wlc( set_trans )
+r = wlc.rpc( set_trans )
 
