@@ -1,6 +1,3 @@
-### ---------------------------------------------------------------------------
-### builtin RPC helpers
-### ---------------------------------------------------------------------------
 
 def _wlc_getfacts(wlc, *vargs, **kvargs):
   """
@@ -22,6 +19,10 @@ def _wlc_getfacts(wlc, *vargs, **kvargs):
     data.update(rsp[0].attrib)    # values are in the XML attributes
 
   return data
+
+## anything included in the 'std_rpc_helpers' will automatically
+## be added to the WLC 'ez' attribute when the WLC object is
+## initially created. 
 
 std_rpc_helpers = {
   'facts': _wlc_getfacts
