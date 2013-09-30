@@ -5,7 +5,9 @@ from pprint import pprint as pp
 
 wlc = WLC_login()
 
-### - add the 'system_services' as an "ez" helper function
+##### -------------------------------------------------------------------------
+####  add the 'system_services' as an "ez" helper function
+##### -------------------------------------------------------------------------
 
 def system_services( wlc, *vargs, **kvargs ):
   """
@@ -36,7 +38,6 @@ def system_services( wlc, *vargs, **kvargs ):
 ##### -------------------------------------------------------------------------
 
 # add this new routine to the WLC "ez" section.
-
 wlc.ez( system_services )
 
 # now call the service
@@ -44,7 +45,6 @@ print "Retrieving System Services ..."
 si = wlc.ez.system_services()
 
 # now show the info:
-
 print "System Services:"
 pp(si)
 

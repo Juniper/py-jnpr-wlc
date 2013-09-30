@@ -51,7 +51,7 @@ class RpcHelper(object):
           helpers table.  Assumes that <function>.__name__
           is usable for later invocations, i.e. its not a lambda
 
-        ez( <function>, name=<name> ):
+        ez( <function>, alias=<name> ):
           Similar to the above, but allows the name option to
           set the name of the ez function rather than taking
           it from <function>.__name__
@@ -60,7 +60,7 @@ class RpcHelper(object):
 
     new_helper = vargs[0]
     new_name = new_helper.__name__
-    if 'name' in kvargs: new_name = kvargs['name']
+    if 'alias' in kvargs: new_name = kvargs['alias']
 
     if callable( new_helper ):
       # other is a single callable item

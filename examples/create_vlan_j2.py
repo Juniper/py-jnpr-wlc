@@ -5,9 +5,7 @@ from lxml import etree
 
 from jnprwlc import WirelessLanController as WLC
 
-#wlc = WLC_login()
-
-wlc = WLC( host='a', user='b', password='c')
+wlc = WLC_login()
 
 ### ---------------------------------------------------------------------------
 ### Technique that uses Jinja2 templating engine to create the XML RPC command
@@ -47,5 +45,5 @@ rpc = trans.as_xml
 
 print "Creating VLAN %s ..." % vlan_vars['name']
 
-# r = wlc.rpc( rpc )
+r = wlc.rpc( rpc )
 
