@@ -21,7 +21,14 @@ class RpcFactory(object):
 
   def Next(self, trans = None):
     """
-      create a new toplevel TRANSACTION element and set the 'tid' attribute
+      create a new toplevel TRANSACTION element and 
+      set the 'tid' attribute.  If trans is provided
+      then that child element is added to the XML.
+
+      Returns tuple of XML objects:
+      (rpc_e, trans_e):
+        rpc_e: TRANSACTION element
+        trans_e: the specific transaction element, e.g. 'GET'
     """
     rpc_e = etree.XML( self.__class__.NEW_TRANS)
     rpc_e.attrib['tid'] = str(self._tid)
@@ -31,7 +38,8 @@ class RpcFactory(object):
 
   def Target( self, parent, target, attrs = {} ):
     """
-      add a 'target' child element and associated attribute parameters
+      add a 'target' child element and associated 
+      attribute parameters
     """
     # if a target is not provided, just return the parent.
     # seems silly, but there is a reason for this.
@@ -90,6 +98,16 @@ class RpcFactory(object):
     return rpc_e       
 
   def __call__( self, trans, target, *vargs, **kvargs ):
+    """
+      calling the factory object will create a new RPC 
+      as an XML object.  
+
+      Two XML objects are returned:
+
+      ( top, trans ):
+        top = TRANSACTION element
+        trans = specific trans element (e.g. 'GET')
+    """    
     trans = trans.upper()
     if 'GET' == trans:
       rpc_e = self.Get( target, vargs, **kvargs )
@@ -108,5 +126,8 @@ class RpcFactory(object):
       trans_e = rpc_e.find('SET')      
     else:
       raise ValueError("Unknown trans: '%s'" % trans)
+
+    # return both the top level TRANSACTION (rpc_e)
+    # and the tranaction sub element (trans_e)
 
     return (rpc_e, trans_e)
