@@ -1,15 +1,9 @@
-import pdb
-
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
-from pprint import pprint as pp 
-from lxml import etree
-from lxml.builder import E 
 import jinja2
+from lxml import etree
 
 from jnprwlc import WirelessLanController as WLC
-from jnprwlc.builder import RpcMaker
-from jnprwlc import RpcFactory
 
 #wlc = WLC_login()
 
