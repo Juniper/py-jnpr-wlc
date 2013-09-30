@@ -17,7 +17,9 @@ wlc = WLC( host='a', user='b', password='c')
 j2_ldr = jinja2.FileSystemLoader( searchpath='.' )
 j2_env = jinja2.Environment( loader=j2_ldr )
 
-def render_j2( filename, env_vars ):
+# -----------------------------------------------------------------------------
+
+def j2_to_xml( filename, env_vars ):
   """
     render jinja2 template into XML
   """
@@ -35,7 +37,7 @@ vlan_vars = {
   'number': '100'
 }
 
-cr8_vlan_xml = render_j2( 'create-vlan.j2.xml', vlan_vars )
+cr8_vlan_xml = j2_to_xml( 'create-vlan.j2.xml', vlan_vars )
 
 trans = wlc.RpcMaker( trans='SET', target='vlan-table' )
 trans.data = cr8_vlan_xml
