@@ -1,7 +1,7 @@
 
 import os
 from sys import argv as ARGV
-from jnprwlc import JuniperWirelessLanController as WLC
+from jnprwlc import WirelessLanController as WLC
 from lxml import etree
 from pprint import pprint as pp
 import argparse

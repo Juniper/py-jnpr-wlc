@@ -1,6 +1,5 @@
-import pdb
 
-# stdlib
+# python stdlib
 import subprocess
 from urllib2 import Request
 from urllib2 import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
@@ -11,13 +10,12 @@ import base64
 # 3rd-party modules
 from lxml import etree
 
-# local helper module
+# local public modules
 from jnprwlc.rpc_helper import RpcHelper, std_rpc_helpers
+from jnprwlc.rpc_factory import RpcFactory
 
 # jnprwlc internal modules
-from ._rpc_factory import _RpcFactory
 from ._rpc_meta import _RpcMetaExec
-from jnprwlc.builder import RpcMaker
 
 DEFAULT_HTTP = 'https'
 DEFAULT_PORT = 8889
@@ -33,61 +31,81 @@ DEFAULT_TIMEOUT = 3
 ### ===========================================================================
 ### ---------------------------------------------------------------------------
 
-class JuniperWirelessLanController(object):
+class WirelessLanController(object):
   """
     Main class to manage a Juniper Wireless Lan Controller (WLC) product
-
-    ----------------------------
-    Public READ-WRITE properties
-    ----------------------------
-    - user: str, username accessing the WLC    
-    - hostname: str, hostname of the WLC
-    - timeout: int, time in seconds to call timeout on reaching the  WLC
-
-    ---------------------------
-    Public READ-ONLY properties
-    ---------------------------
-    - password: str, password to access the WLC
-
-    ---------------------------
-    Public READ-ONLY attributes
-    ---------------------------
-    - rpc: used to meta execute RPCs to the WLC
-
-    --------------
-    Public methods
-    --------------
-    - open: 'opens' a connection to the WLC
-    - close: 'closes' a connection to the WLC
-    - execute: executes an RPC command and returns the response
-
   """
 
-
+  ### ---------------------------------------------------------------------------
+  ### property: hostname
+  ### ---------------------------------------------------------------------------
 
   @property
   def hostname(self):
-      return self._hostname
+    """
+      The hostname/ip-addr of the WLC
+    """
+    return self._hostname
+
+  ### ---------------------------------------------------------------------------
+  ### property: user
+  ### ---------------------------------------------------------------------------
   
   @property
   def user(self):
-      return self._user
+    """
+      The login user accessing the WLC
+    """
+    return self._user
+
+  ### ---------------------------------------------------------------------------
+  ### property: password
+  ### ---------------------------------------------------------------------------
 
   @property
+  def password(self):
+    """
+      The login password to access the WLC
+    """
+    return None  # read-only      
+
+  @password.setter
+  def password(self, value):
+    self._password = value
+
+  ### ---------------------------------------------------------------------------
+  ### property: timeout
+  ### ---------------------------------------------------------------------------
+
+  @property  
   def timeout(self):
-      return self._timeout
+    """
+      The timeout (seconds) before declaring ping-check timeout
+    """
+    return self._timeout
+
   @timeout.setter
   def timeout(self, value):
       self._timeout = value
   
-  @property
-  def password(self):
-      return None  # read-only      
-  @password.setter
-  def password(self, value):
-      self._password = value
+  # ===========================================================================
+  #                                  CONSTRUCTOR
+  # ===========================================================================
 
   def __init__(self, *vargs, **kvargs):
+    """
+      Required name/value arguments:
+      ------------------------------
+      - host: hostname/ip-address
+      - user: login user
+      - password: login password
+
+      Optional name/value arguments:
+      ------------------------------
+      - port: DEFAULT_PORT(8889)
+      - timeout: DEFAULT_TIMEOUT(3)
+      - http: DEFAULT_HTTP('https')
+    """
     _rqd_args = 'host user password'.split()
 
     # flatten vargs into kvargs
@@ -104,9 +122,13 @@ class JuniperWirelessLanController(object):
     self._proto = kvargs.get('http', DEFAULT_HTTP)
     self._timeout = kvargs.get('timeout', DEFAULT_TIMEOUT)
 
-    self._rpc_factory = _RpcFactory(self)
+    self._rpc_factory = RpcFactory()
     self.rpc = _RpcMetaExec(self, self._rpc_factory)
     self.ez = RpcHelper(self, load_helpers=std_rpc_helpers)
+
+  ### ---------------------------------------------------------------------------
+  ### _setup_http: used to create/setup HTTP transport mechanism
+  ### ---------------------------------------------------------------------------
 
   def _setup_http(self):
 
@@ -124,6 +146,10 @@ class JuniperWirelessLanController(object):
     self._http_api = build_opener(auth_hndlr, https_hndlr, http_hndlr)
     self._auth_base64 = base64.encodestring('%s:%s' % (self._user, self._password))[:-1]          
 
+  ### ---------------------------------------------------------------------------
+  ### _ping_test(): used to ensure WLC is ping reachable
+  ### ---------------------------------------------------------------------------
+
   def _ping_test(self):
     """
       attempts to ping the WLC device.  This only works on Unix systems that 
@@ -135,10 +161,14 @@ class JuniperWirelessLanController(object):
     if 0 != ping.wait():
       raise RuntimeError("Unable to ping host: " + self._hostname)
 
+  ### ---------------------------------------------------------------------------
+  ### open(): sets up HTTP transport and verifies reachablility
+  ### ---------------------------------------------------------------------------
+
   def open(self):
     """
-      open is used to setup the HTTP/s process and verify connectivity and user 
-      access to the WLC
+      open is used to setup the HTTP/s process and verify 
+      connectivity and user access to the WLC
     """
 
     self._setup_http()
@@ -154,13 +184,9 @@ class JuniperWirelessLanController(object):
 
     return True if rpc_rsp.attrib['nerrors'] == "0" else False
 
-  hello = open    # alias 'hello()' to 'open()'
-
-  def close(self):
-    """
-      close doesn't do anything ... for now.
-    """
-    return True
+  ### ---------------------------------------------------------------------------
+  ### execute(): executes an RPC command
+  ### ---------------------------------------------------------------------------
 
   def execute( self, rpc_cmd ):
     """
@@ -190,3 +216,13 @@ class JuniperWirelessLanController(object):
     # the action response; i.e. the first child
 
     return rsp_e[0] if len(rsp_e) else rsp_e
+
+  ### ---------------------------------------------------------------------------
+  ### close(): nada, placeholder for future 'cleanup on close'
+  ### ---------------------------------------------------------------------------
+
+  def close(self):
+    """
+      close doesn't do anything ... for now.
+    """
+    return True

@@ -8,8 +8,9 @@ from lxml.builder import E
 import jinja2
 
 from jnprwlc.builder import RpcMaker
+from jnprwlc import RpcFactory
 
-wlc = WLC_login()
+#wlc = WLC_login()
 
 ### ---------------------------------------------------------------------------
 ### Technique that uses Jinja2 templating engine to create the XML RPC command
@@ -35,12 +36,14 @@ cr8_vlan_txt = j2_cr8_vlan.render( vlan_vars )
 # now convert the txt to XML
 cr8_vlan_xml = etree.XML( cr8_vlan_txt )
 
-trans = RpcMaker( wlc, 'SET' )
+factory = RpcFactory()
+
+trans = RpcMaker( trans='SET' )
 trans.target = 'vlan-table'
 trans.data = cr8_vlan_xml
+trans.factory = factory
 
 # now perform the transaction
-
 rpc = trans.as_rpc
 
 print "Creating VLAN %s ..." % vlan_vars['name']

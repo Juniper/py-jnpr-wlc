@@ -9,16 +9,15 @@
 from lxml import etree
 import re
 
-class _RpcFactory(object):
+class RpcFactory(object):
 
   NEW_TRANS = """
     <TRANSACTION tid="0">
     <SESSION/>
     </TRANSACTION>
   """
-  def __init__( self, wlc ):
+  def __init__( self ):
     self._tid = 1
-    self._wlc = wlc       # not used, but keeping tabs on it, just in case
 
   def Next(self, trans = None):
     """
