@@ -21,13 +21,22 @@ def _parse_args():
   cli.add_argument( '-p', '--password', action="store", dest='password',  default=None )
 
   cli_args = cli.parse_args()
-  if not cli_args.password: cli_args.password = getpass()
 
+  # allow for a -u <user>@<host> type of option
   try:
     user,target = cli_args.user.split('@')
     cli_args.user = user
     cli_args.target = target
   except ValueError: pass
+
+  # ensure a target is provided
+  if not cli_args.target:
+    raise RuntimeError("You must specify the 'target' parameter")
+
+  # ensure a password is provided
+  if not cli_args.password: cli_args.password = getpass()  
+  if cli_args.password == '':
+    raise RuntimeError("You must provide a password!")
 
   return cli_args
 
@@ -37,6 +46,8 @@ def _parse_args():
 
 def WLC_login():
   cli_args = _parse_args()
+
+
 
   login = {
    'user': cli_args.user,

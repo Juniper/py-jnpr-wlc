@@ -1,4 +1,4 @@
-import pdb
+
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
@@ -26,8 +26,8 @@ def system_services( wlc, *vargs, **kvargs ):
   ret_data = {}     # empty dictionary
 
   for svc, rpc in run_list.items():
-    rsp = rpc()
-    ret_data[svc] = dict(rsp[0].attrib)
+    rsp = rpc()                           # execute the RPC
+    ret_data[svc] = dict(rsp[0].attrib)   # copy the attributes into a dictionary
 
   return ret_data
   
