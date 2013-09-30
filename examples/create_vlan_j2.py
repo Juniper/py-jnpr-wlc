@@ -1,9 +1,13 @@
+import pdb
+
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
 from lxml import etree
 from lxml.builder import E 
 import jinja2
+
+from jnprwlc.builder import RpcMaker
 
 wlc = WLC_login()
 
@@ -21,8 +25,8 @@ j2_cr8_vlan = j2_env.get_template( 'create-vlan.j2' )
 # template file.
 
 vlan_vars = {
-  'name': 'Jeremy',
-  'number': 100
+  'name': 'Jeremy123',
+  'number': 123
 }
 
 # now merge the template with the vars
@@ -31,14 +35,15 @@ cr8_vlan_txt = j2_cr8_vlan.render( vlan_vars )
 # now convert the txt to XML
 cr8_vlan_xml = etree.XML( cr8_vlan_txt )
 
-# now create the transaction
-
-trans = E.TRANSACTION({'tid': '0'},
-  E.SESSION,
-  E.SET( cr8_vlan_xml ))
+trans = RpcMaker( wlc, 'SET' )
+trans.target = 'vlan-table'
+trans.data = cr8_vlan_xml
 
 # now perform the transaction
 
+rpc = trans.as_rpc
+
 print "Creating VLAN %s ..." % vlan_vars['name']
-r = wlc.rpc( trans )
+
+# r = wlc.rpc( rpc )
 

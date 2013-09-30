@@ -7,6 +7,7 @@
 ### ---------------------------------------------------------------------------
 
 from lxml import etree
+import re
 
 class _RpcFactory(object):
 
@@ -19,67 +20,94 @@ class _RpcFactory(object):
     self._tid = 1
     self._wlc = wlc       # not used, but keeping tabs on it, just in case
 
-  def Next(self):
+  def Next(self, trans = None):
+    """
+      create a new toplevel TRANSACTION element and set the 'tid' attribute
+    """
     rpc_e = etree.XML( self.__class__.NEW_TRANS)
     rpc_e.attrib['tid'] = str(self._tid)
     self._tid += 1
-    return rpc_e
+    trans_e = etree.SubElement( rpc_e, trans ) if trans else None
+    return (rpc_e, trans_e)
+
+  def Target( self, parent, target, attrs = {} ):
+    """
+      add a 'target' child element and associated attribute parameters
+    """
+    # if a target is not provided, just return the parent.
+    # seems silly, but there is a reason for this.
+    if not target: return parent
+
+    # create the target child element
+    target_e = etree.SubElement( parent, target.upper() )    
+
+    # add any attributes from attrs to the action
+    for k,v in attrs.items(): 
+      k = re.sub('_','-',k)
+      target_e.attrib[k] = str(v)
+
+    return target_e
 
   def Get(self, target, *vargs, **kvargs ):
     """
       transcation: GET
     """
-    rpc_e = self.Next()
-    get_e = etree.SubElement(rpc_e, "GET")
-    get_e.attrib['level'] = 'all'
-    target_e = etree.SubElement( get_e, target.upper() )    
-
-    if kvargs:  # kvargs is the <key>=<value> for a unique object
-      key, value = next(kvargs.iteritems())
-      target_e.attrib[key] = str(value)
-
+    rpc_e, trans_e = self.Next('GET')
+    trans_e.attrib['level'] = 'all'
+    self.Target( trans_e, target, attrs=kvargs )
     return rpc_e
 
   def GetStat(self, target, *vargs, **kvargs ):
     """
       transaction: GET-STAT
     """
-    rpc_e = self.Next()
-    trans_e = etree.SubElement(rpc_e, "GET-STAT")
-    target_e = etree.SubElement( trans_e, target.upper() )    
-
-    if kvargs:  # kvargs is the <key>=<value> for a unique object
-      key, value = next(kvargs.iteritems())
-      target_e.attrib[key] = str(value)
-
+    rpc_e, trans_e = self.Next('GET-STAT')
+    self.Target( trans_e, target, attrs=kvargs )
     return rpc_e
 
   def Delete(self, target, *vargs, **kvargs ):
     """
       transaction: ACT+DELETE
     """
-    rpc_e = self.Next()
-    trans_e = etree.SubElement(rpc_e, 'ACT')
+    rpc_e, trans_e = self.Next('ACT')
     del_e = etree.SubElement(trans_e, 'DELETE')
-    target_e = etree.SubElement( del_e, target.upper() )    
-
-    if kvargs:  # kvargs is the <key>=<value> for a unique object
-      key, value = next(kvargs.iteritems())
-      target_e.attrib[key] = str(value)
-
+    self.Target( del_e, target, attrs=kvargs )
     return rpc_e
 
   def Action(self, action, *vargs, **kvargs):
     """
       transaction: ACT
     """
-    rpc_e = self.Next();
-    trans_e = etree.SubElement(rpc_e,"ACT")
-    act_e = etree.SubElement(trans_e, action.upper())
-
-    # add any attributes from kvargs to the action
-    for k,v in kvargs.items(): 
-      k = re.sub('_','-',k)
-      act_e.attrib[k] = v
-
+    rpc_e, trans_e = self.Next('ACT');
+    self.Target( trans_e, action, attrs=kvargs )
     return rpc_e   
+
+  def Set(self, target, *vargs, **kvargs):
+    """
+      transaction: SET
+    """
+    rpc_e, trans_e = self.Next('SET');
+    self.Target( trans_e, target, attrs=kvargs )
+    return rpc_e       
+
+  def __call__( self, trans, target, *vargs, **kvargs ):
+    trans = trans.upper()
+    if 'GET' == trans:
+      rpc_e = self.Get( target, vargs, **kvargs )
+      trans_e = rpc_e.find('GET')
+    elif 'GET-STAT' == trans:
+      rpc_e = self.GetStat( target, vargs, **kvargs )
+      trans_e = rpc_e.find('GET-STAT')
+    elif 'DELETE' == trans:
+      rpc_e = self.Delete( target, vargs, **kvargs )
+      trans_e = rpc_e.find('ACT/DELETE')
+    elif 'ACT' == trans:
+      rpc_e = self.Action( target, vargs, **kvargs )
+      trans_e = rpc_e.find('ACT')
+    elif 'SET' == trans:
+      rpc_e = self.Set( target, vargs, **kvargs )
+      trans_e = rpc_e.find('SET')      
+    else:
+      raise ValueError("Unknown trans: '%s'" % trans)
+
+    return (rpc_e, trans_e)

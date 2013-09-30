@@ -1,11 +1,9 @@
-<VLAN-TABLE>
-  <VLAN state="ACTIVE" tunnel-affinity="5" number="{{ number }}" name="{{ name }}">
-    <VLAN-IP vrouter="local"/>
-    <VLAN-MEMBER-TABLE/>
-    <VLAN-FDB aging-time="300">
-      <VLAN-FDB-TABLE/>
-    </VLAN-FDB>
-    <VLAN-IGMP robustness-value="2" query-interval="125" other-querier-interval="255" query-response-interval="100" last-member-query-interval="10" proxy-report="YES" igmp-version="2" enabled="YES" mrouter-solicitation="NO" querier-enabled="NO" mrsol-interval="30"/>
-    <VLAN-STP instance="100" enabled="NO"/>
-  </VLAN>
-</VLAN-TABLE>
+<VLAN state="ACTIVE" tunnel-affinity="5" number="{{ number }}" name="{{ name }}">
+  <VLAN-IP vrouter="local"/>
+  <VLAN-MEMBER-TABLE/>
+  <VLAN-FDB aging-time="300">
+    <VLAN-FDB-TABLE/>
+  </VLAN-FDB>
+  <VLAN-IGMP robustness-value="2" query-interval="125" other-querier-interval="255" query-response-interval="100" last-member-query-interval="10" proxy-report="YES" igmp-version="2" enabled="YES" mrouter-solicitation="NO" querier-enabled="NO" mrsol-interval="30"/>
+  <VLAN-STP instance="100" enabled="NO"/>
+</VLAN>

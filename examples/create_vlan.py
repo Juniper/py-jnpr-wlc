@@ -21,8 +21,11 @@ set_trans = E.TRANSACTION({'tid': '0'},
 
 # create the VLAN-TABLE element
 
+vlan_name = 'Jeremy'
+vlan_number = '200'
+
 add_vlan_ele = E('VLAN-TABLE',
-  E.VLAN({'number': '100', 'name': 'Jeremy', 'state': 'ACTIVE', 'tunnel-affinity': '5'},
+  E.VLAN({'number': vlan_number, 'name': vlan_name, 'state': 'ACTIVE', 'tunnel-affinity': '5'},
     E('VLAN-IP', {'vrouter': 'local'}),
     E('VLAN-MEMBER-TABLE'),
     E('VLAN-FDB', {'aging-time': '300'},
@@ -40,7 +43,7 @@ add_vlan_ele = E('VLAN-TABLE',
                     'last-member-query-interval':"10",
                     'robustness-value':"2"
                   }),
-    E('VLAN-STP',{'enabled':"NO",'instance':"100"})
+    E('VLAN-STP',{'enabled':"NO",'instance': vlan_number})
   ))
 
 # insert the data into the 'SET' node-set
@@ -49,5 +52,5 @@ set_trans.find('SET').append( add_vlan_ele )
 
 # now perform the transaction
 
-r = wlc.rpc( set_trans )
+#r = wlc.rpc( set_trans )
 

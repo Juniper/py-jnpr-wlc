@@ -1,4 +1,4 @@
-
+import pdb
 
 # stdlib
 import subprocess
@@ -12,11 +12,18 @@ import base64
 from lxml import etree
 
 # local helper module
-from jnprwlc.helper import RpcHelper, std_rpc_helpers
+from jnprwlc.rpc_helper import RpcHelper, std_rpc_helpers
 
 # jnprwlc internal modules
 from ._rpc_factory import _RpcFactory
 from ._rpc_meta import _RpcMetaExec
+from jnprwlc.builder import RpcMaker
+
+DEFAULT_HTTP = 'https'
+DEFAULT_PORT = 8889
+DEFAULT_API_URI = "/trapeze/ringmaster"
+DEFAULT_API_USER_AGENT = 'Juniper Networks RingMaster'
+DEFAULT_TIMEOUT = 3
 
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
@@ -56,15 +63,12 @@ class JuniperWirelessLanController(object):
 
   """
 
-  DEFAULT_HTTP = 'https'
-  DEFAULT_PORT = 8889
-  DEFAULT_API_URI = "/trapeze/ringmaster"
-  DEFAULT_API_USER_AGENT = 'Juniper Networks RingMaster'
-  DEFAULT_TIMEOUT = 3
+
 
   @property
   def hostname(self):
       return self._hostname
+  
   @property
   def user(self):
       return self._user
@@ -96,9 +100,9 @@ class JuniperWirelessLanController(object):
     self._hostname = kvargs['host']
     self._user = kvargs['user']
     self._password = kvargs['password']
-    self._port = kvargs.get('port', self.__class__.DEFAULT_PORT)
-    self._proto = kvargs.get('http', self.__class__.DEFAULT_HTTP)
-    self._timeout = kvargs.get('timeout', self.__class__.DEFAULT_TIMEOUT)
+    self._port = kvargs.get('port', DEFAULT_PORT)
+    self._proto = kvargs.get('http', DEFAULT_HTTP)
+    self._timeout = kvargs.get('timeout', DEFAULT_TIMEOUT)
 
     self._rpc_factory = _RpcFactory(self)
     self.rpc = _RpcMetaExec(self, self._rpc_factory)
@@ -110,7 +114,7 @@ class JuniperWirelessLanController(object):
       http=self._proto,
       host=self._hostname,
       port=self._port,
-      api_uri = self.__class__.DEFAULT_API_URI )
+      api_uri = DEFAULT_API_URI )
 
     auth_mgr = HTTPPasswordMgrWithDefaultRealm()
     auth_mgr.add_password( None, self._api_uri, self._user, self._password )
@@ -145,7 +149,7 @@ class JuniperWirelessLanController(object):
     # if there is an issue communicating to the WLC, then
     # this action will raise an exception (urllib2)
 
-    rpc_cmd = self._rpc_factory.Next()
+    rpc_cmd, dev_null = self._rpc_factory.Next()
     rpc_rsp = self.execute( rpc_cmd )
 
     return True if rpc_rsp.attrib['nerrors'] == "0" else False
@@ -169,7 +173,7 @@ class JuniperWirelessLanController(object):
     """
 
     req = Request( self._api_uri )
-    req.add_header('User-Agent', self.__class__.DEFAULT_API_USER_AGENT)         
+    req.add_header('User-Agent', DEFAULT_API_USER_AGENT)         
     req.add_header("Authorization", "Basic %s" % self._auth_base64)
 
     if isinstance(rpc_cmd, str):
