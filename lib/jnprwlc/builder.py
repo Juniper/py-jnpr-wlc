@@ -95,7 +95,7 @@ class RpcMaker(object):
   #                                  CONSTRUCTOR
   # ===========================================================================
 
-  def __init__(self, wlc=None, trans='GET', target=None ):
+  def __init__(self, wlc, trans='GET', target=None, *vargs, **kvargs ):
     """
       wlc: should be the WLC object so we can self-invoke the RPC
       trans: transaction type from TRANSACTIONS_LIST
@@ -105,6 +105,7 @@ class RpcMaker(object):
     self.trans = trans
     self.target = target
     self.data = None
+    self.args = kvargs
 
   # ---------------------------------------------------------------------------
   # property: as_rpc

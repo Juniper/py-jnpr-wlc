@@ -12,6 +12,7 @@ from lxml import etree
 # local public modules
 from jnprwlc.rpc_helper import RpcHelper, std_rpc_helpers
 from jnprwlc.rpc_factory import RpcFactory
+from jnprwlc.builder import RpcMaker
 
 # jnprwlc internal modules
 from ._rpc_meta import _RpcMetaExec
@@ -222,6 +223,16 @@ class WirelessLanController(object):
     # the action response; i.e. the first child
 
     return rsp_e[0] if len(rsp_e) else rsp_e
+
+  ### ---------------------------------------------------------------------------
+  ### RpcMaker: creates a new RpcMaker object bound to this WLC
+  ### ---------------------------------------------------------------------------
+
+  def RpcMaker( self, trans='GET', target=None, *vargs, **kvargs ):
+    """
+      creates a new RpcMaker object bound to this WLC
+    """
+    return RpcMaker( self, trans, target, vargs, **kvargs )
 
   ### ---------------------------------------------------------------------------
   ### close(): nada, placeholder for future 'cleanup on close'

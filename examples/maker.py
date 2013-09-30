@@ -8,8 +8,7 @@ from jnprwlc import RpcFactory
 
 wlc = WLC(host='a', user='b', password='c')
 
-r = RpcMaker( wlc = wlc, trans='get' )
-r.target = 'vlan'
+r = wlc.RpcMaker( target='vlan')
 r.args = dict( name='Jeremy' )
 
 
