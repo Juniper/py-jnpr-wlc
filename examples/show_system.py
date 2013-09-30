@@ -5,7 +5,7 @@ from pprint import pprint as pp
 wlc = WLC_login()
 
 # just display the dict of the values
-si = wlc.ez.system()
+si = wlc.ez.facts()
 
 print "System Name: %s" % si['name']
 print "System IP Address: %s" % si['ip-addr']
