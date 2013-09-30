@@ -26,7 +26,7 @@ DEFAULT_TIMEOUT = 3
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
 ###
-### JuniperWirelessLanController
+### WirelessLanController
 ###
 ### ===========================================================================
 ### ---------------------------------------------------------------------------
@@ -118,9 +118,11 @@ class WirelessLanController(object):
     self._hostname = kvargs['host']
     self._user = kvargs['user']
     self._password = kvargs['password']
+
     self._port = kvargs.get('port', DEFAULT_PORT)
     self._proto = kvargs.get('http', DEFAULT_HTTP)
     self._timeout = kvargs.get('timeout', DEFAULT_TIMEOUT)
+    self._api_uri = None
 
     self._rpc_factory = RpcFactory()
     self.rpc = _RpcMetaExec(self, self._rpc_factory)
@@ -132,11 +134,11 @@ class WirelessLanController(object):
 
   def _setup_http(self):
 
-    self._api_uri = '{http}://{host}:{port}{api_uri}'.format(
-      http=self._proto,
-      host=self._hostname,
-      port=self._port,
-      api_uri = DEFAULT_API_URI )
+    self._api_uri = '{http}://{host}:{port}{uri}'.format(
+      http = self._proto,
+      host = self._hostname,
+      port = self._port,
+      uri = DEFAULT_API_URI )
 
     auth_mgr = HTTPPasswordMgrWithDefaultRealm()
     auth_mgr.add_password( None, self._api_uri, self._user, self._password )
@@ -155,9 +157,11 @@ class WirelessLanController(object):
       attempts to ping the WLC device.  This only works on Unix systems that 
       has /bin/ping
     """
+
     ping = subprocess.Popen(
       ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
       stdout=subprocess.PIPE) 
+
     if 0 != ping.wait():
       raise RuntimeError("Unable to ping host: " + self._hostname)
 
@@ -197,6 +201,9 @@ class WirelessLanController(object):
       - str: fully formulated WLC raw XML as string
       - etree._Element: built from the _RpcFactory 
     """
+
+    if not self._api_uri:
+      raise RuntimeError("WLC session has not been opened")
 
     req = Request( self._api_uri )
     req.add_header('User-Agent', DEFAULT_API_USER_AGENT)         

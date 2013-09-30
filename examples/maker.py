@@ -1,8 +1,16 @@
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
-from jnprwlc.builder import RpcMaker
 
-wlc = WLC_login()
-r = RpcMaker( wlc )
+from jnprwlc import WirelessLanController as WLC
+from jnprwlc.builder import RpcMaker
+from jnprwlc import RpcFactory
+
+wlc = WLC(host='a', user='b', password='c')
+
+r = RpcMaker( wlc = wlc, trans='get' )
+r.target = 'vlan'
+r.args = dict( name='Jeremy' )
+
+
 

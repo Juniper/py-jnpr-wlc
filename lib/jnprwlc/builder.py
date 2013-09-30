@@ -1,4 +1,5 @@
 
+import re
 from lxml import etree
 from lxml.builder import ElementMaker
 
@@ -52,6 +53,20 @@ class RpcMaker(object):
       return self._target
 
   # ---------------------------------------------------------------------------
+  # property: args
+  #    target arguments, dict
+  # ---------------------------------------------------------------------------  
+
+  @property
+  def args(self):
+      return self._args
+
+  @args.setter  
+  def args(self, value):
+      self._args = value
+  
+
+  # ---------------------------------------------------------------------------
   # property: data
   #    XML data contained in 'taget'.  This is typcially used for SET/CREATE
   #    type operations
@@ -81,6 +96,11 @@ class RpcMaker(object):
   # ===========================================================================
 
   def __init__(self, wlc=None, trans='GET', target=None ):
+    """
+      wlc: should be the WLC object so we can self-invoke the RPC
+      trans: transaction type from TRANSACTIONS_LIST
+      target: target API object, optional
+    """
     self.wlc = wlc
     self.trans = trans
     self.target = target
@@ -92,19 +112,52 @@ class RpcMaker(object):
   # ---------------------------------------------------------------------------  
 
   @property
-  def as_rpc(self):
+  def as_xml(self):
     """
-      Creates the actual RPC from the associated properties
+      creates the actual RPC from the associated properties
     """
     rpc_e, trans_e = self._factory( self._trans, self._target )
+
+    # if there is a target, then add that child element and
+    # bind any associated target args
+
+    if self._target != None:
+      target_e = trans_e.find(self._target)
+      # add any attributes from attrs to the action
+      for k,v in self._args.items(): 
+        k = re.sub('_','-',k)
+        target_e.attrib[k] = str(v)
+      at_data = target_e
+    else:
+      at_data = trans_e
 
     # if there is data to attach, then append it into the RPC
     # either with the 'target' if one exists, or at the transaction
 
     if self._data != None:
-      if self._target != None:
-        trans_e.find(self._target).append( self._data )
-      else:
-        trans_e.append( self._data )
+      at_data.append( self._data )
 
     return rpc_e
+
+  # ---------------------------------------------------------------------------
+  # __repr__: string serialization
+  # ---------------------------------------------------------------------------  
+
+  def __repr__(self):
+    """
+      perform RPC generation and serialize XML to string
+      using the etree.tostring() method
+    """
+    return etree.tostring( self.as_xml, pretty_print=True )
+
+  # ---------------------------------------------------------------------------
+  # __call__: invoke RPC against the bound WLC and return the RESP 
+  # ---------------------------------------------------------------------------  
+
+  def __call__(self):
+    """
+      callable object will invoke the RPC against the bound WLC and 
+      return the RESP as XML object
+    """
+    assert( self._wlc )
+    return self._wlc.rpc( self.as_xml )
