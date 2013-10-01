@@ -1,8 +1,14 @@
 # ABOUT
 
-Python module for Juniper Wireless Lan Controller (WLC) product
+  Python module for Juniper Wireless Lan Controller (WLC) product
 
-**STATUS**: Experimental, under active development.
+**STATUS**: Experimental, under active development.  The WLC XML API is not public, but can be made available to existing customers.
+
+# OVERVIEW
+
+  The Juniper Wireless LAN Controller products implement a comprehensive HTTP/s API using XML as the content-data.  This module provides a *metaprogramming* set of capabilities to fully utilize the API in any easy and consumable manner.  To proficiently use this API, you should be familiar with [XML](http://www.w3schools.com/xml/) and [XPath](http://www.w3schools.com/xpath/) expressions.  This module uses the 3rd-party [lxml](http://lxml.de/index.html) python module for XML processing.
+  
+  This module is developed and tested with Python 2.7.  If you are using another version and it works, please notify the maintainer.  If you are using another version and it does **not** work, please open an issue.
 
 ## Quick Example
 
@@ -99,6 +105,15 @@ wlc.close()
 '78:19:F7:70:96:76'
 
 ````
+
+## METAPROGRAMMING API
+
+   
+
+#### Using `rpc.<cmd>_<target>(<attribs>)` to metaprogram RPC calls
+#### Using `RpcMaker()` to metaprogram RPC calls
+#### Using `rpc()` to execute existing RPCs
+
 ## DEPENDENCIES
 
   * [Python 2.7](http://www.python.org/)
