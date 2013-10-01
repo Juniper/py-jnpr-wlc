@@ -10,7 +10,7 @@ import base64
 from lxml import etree
 
 # local public modules
-from jnprwlc.rpc_helper import RpcHelper, std_rpc_helpers
+from jnprwlc.helpers import RpcHelper, std_rpc_helpers
 from jnprwlc.rpc_factory import RpcFactory
 from jnprwlc.builder import RpcMaker
 
