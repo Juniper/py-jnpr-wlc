@@ -1,5 +1,5 @@
 
-import os
+import sys, os
 from sys import argv as ARGV
 from jnprwlc import WirelessLanController as WLC
 from lxml import etree
@@ -72,7 +72,7 @@ def WLC_login():
 
   if not login_ok:
     print "Too many login failures, exiting"
-    os.exit(1)
+    sys.exit(1)
 
   return wlc
 

@@ -6,11 +6,14 @@
 ### ===========================================================================
 ### ---------------------------------------------------------------------------
 
+import pdb
+
 class RpcHelper(object):
 
   def __init__(self, wlc, load_helpers=None ):
     self._wlc = wlc
     self._helper_fntbl = {}
+    self._children = {}
     if load_helpers: self.Load( load_helpers )
 
   def Get(self, method):
@@ -24,21 +27,47 @@ class RpcHelper(object):
     for method, method_fn in helpers.items():
       self.Set( method, method_fn )
 
+  def Children(self):
+    return self._children.keys()
+
+  def Helpers(self):
+    return self._helper_fntbl.keys()
+
   def __getattr__( self, method ):
     """
       implements "method_missing", so perform a lookup in the known
       helpers and return the function if found.  otherwise raise
       an AttributeError exception
     """
+
+    # first see if this is a child request
+    if method in self._children:
+      return self._children[method]
+
     method_fn = self.Get(method)
+
+    # if this helper doesn't know about the
+    # request method, then return a function
+    # that will raise an AttributeError
+
     if not method_fn: 
       def _no_method_fn(*vargs, **kvargs):
         raise AttributeError("Unknown ez helper: '%s'" % method)
       return _no_method_fn
 
+    # otherwise, return a function that will in turn
+    # invoke the helper function passing the associated
+    # WLC object and called arguments
+
     def _helper_fn(*vargs, **kvargs):
       return method_fn(self._wlc, vargs, **kvargs)
     return _helper_fn
+
+  def _create_child( self, options ):
+    name = options['child']
+    new_helper = self.__class__(self._wlc, options.get('load'))
+    self._children[name] = new_helper
+    return new_helper
 
   def __call__(self, *vargs, **kvargs ):
     """
@@ -56,7 +85,13 @@ class RpcHelper(object):
           set the name of the ez function rather than taking
           it from <function>.__name__
 
+        ez( child=<name>, methods=<list> ):
+          Creates a child helper object
+
     """
+
+    if 'child' in kvargs:
+      return self._create_child(kvargs)
 
     new_helper = vargs[0]
     new_name = new_helper.__name__

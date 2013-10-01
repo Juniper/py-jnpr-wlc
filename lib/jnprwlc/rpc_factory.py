@@ -10,6 +10,11 @@ from lxml import etree
 import re
 
 class RpcFactory(object):
+  """
+    RpcFactory is used to create standalone RPC objects as lxml 
+    Element. Each WLC object will maintain an RpcFactory object as 
+    a private attribute.
+  """
 
   NEW_TRANS = """
     <TRANSACTION tid="0">

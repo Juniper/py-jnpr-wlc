@@ -17,4 +17,7 @@ def wlc_getfacts(wlc, *vargs, **kvargs):
     rsp = rpc()                   
     data.update(rsp[0].attrib)    # values are in the XML attributes
 
+  # make a copy of the facts into the WLC object
+  wlc.facts = dict(data)
+
   return data

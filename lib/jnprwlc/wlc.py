@@ -33,7 +33,7 @@ DEFAULT_TIMEOUT = 3
 
 class WirelessLanController(object):
   """
-    Main class to manage a Juniper Wireless Lan Controller (WLC) product
+    Juniper Wireless Lan Controller (WLC)
   """
 
   ### ---------------------------------------------------------------------------
@@ -171,22 +171,19 @@ class WirelessLanController(object):
 
   def open(self):
     """
-      open is used to setup the HTTP/s process and verify 
-      connectivity and user access to the WLC
+      Uused to setup the HTTP/s process and verify 
+      connectivity and user access to the WLC.  When
+      successful, the WLC 'facts' are automatically
+      loaded and stored into the 'facts' attribute.  These
+      facts are then returned by open().  For details on
+      the 'facts' see [helpers/wlc_getfacts.py]
     """
 
     self._setup_http()
     self._ping_test()
 
-    # clear to send the HTTP command and see what comes back
-    # return True if the response contains no errors.
-    # if there is an issue communicating to the WLC, then
-    # this action will raise an exception (urllib2)
-
-    rpc_cmd, dev_null = self._rpc_factory.Next()
-    rpc_rsp = self.execute( rpc_cmd )
-
-    return True if rpc_rsp.attrib['nerrors'] == "0" else False
+    self.ez.facts()
+    return self.facts
 
   ### ---------------------------------------------------------------------------
   ### execute(): executes an RPC command
