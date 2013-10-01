@@ -2,7 +2,8 @@
 
   Python module for Juniper Wireless LAN Controller (WLC)
 
-**STATUS**: Experimental, under active development.  The WLC XML API is not public, but can be made available to existing customers.
+**STATUS**: Experimental, under active development.  
+The WLC XML API is not public, but can be made available to existing customers.
 
 # OVERVIEW
 
