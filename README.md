@@ -8,7 +8,6 @@ Python module for Juniper Wireless Lan Controller (WLC) product
 
 ````python
 from jnprwlc import WirelessLanController as WLC
-from lxml import etree
 
 wlc = WLC( user='jeremy', host='192.168.10.27', password='logmeIn' )
 
@@ -24,7 +23,7 @@ vlans = wlc.rpc.get_vlan()
 for vlan in vlans.xpath('VLAN'):
   v_num = vlan.attrib['number']
   v_name = vlan.attrib['name']
-  print "VLAN(%d) is named: %s" % (v_num, v_name)
+  print "VLAN(%s) is named: %s" % (v_num, v_name)
 
 # cleanup/close
 wlc.close()
