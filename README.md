@@ -90,6 +90,13 @@ wlc.close()
  'tunnelsecurity': 'NONE',
  'type': 'DP',
  'uptime': '0'}
+ 
+
+>>> wlc.facts['serialnumber']
+'JJ0211401124'
+
+>>> wlc.facts['macaddress']
+'78:19:F7:70:96:76'
 
 ````
 ## DEPENDENCIES
