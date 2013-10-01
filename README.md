@@ -26,7 +26,7 @@ wlc.open()
 #    wlc.rpc.set_xyz()        -- SET (for basic things)
 #
 #    Note: For more complicated create/set metaprogramming
-#          you would use the wlc.rpc.RpcMaker() object.
+#          you would use the wlc.RpcMaker() object.
 #          Documentation on that to follow shortly, but
 #          you can see examples in the example directory
 #
