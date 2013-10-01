@@ -260,8 +260,10 @@ class WirelessLanController(object):
 
     if isinstance(rpc_cmd, str):
       rpc_cmd_txt = rpc_cmd
+      rpc_cmd_e = None
     elif isinstance(rpc_cmd, etree._Element):
       rpc_cmd_txt = etree.tostring( rpc_cmd )
+      rpc_cmd_e = rpc_cmd
     else:
       raise ValueError("Dont know what to do with rpc of type %s" % rpc_cmd.__class__.__name__)
 
@@ -275,17 +277,24 @@ class WirelessLanController(object):
       self._log_transaction( rpc_cmd_txt, rpc_rsp_txt )
 
     # covert string to XML for processing
-    rsp_e = etree.XML( rpc_rsp_txt)
+    rpc_rsp_e = etree.XML( rpc_rsp_txt)
 
     # now return the XML element starting with the top of
     # the action response; i.e. the first child
 
-    ret_rsp = rsp_e[0] if len(rsp_e) else rsp_e
+    ret_rsp_e = rpc_rsp_e[0] if len(rpc_rsp_e) else rpc_rsp_e
 
-    if 'ERROR-RESP' == ret_rsp.tag:
-      raise RpcError( rpc_cmd, ret_rsp )
+    if 'ERROR-RESP' == ret_rsp_e.tag:
+      # if there is an error, then generate
+      # an exception.  Always bind the XML data
+      # to the exception. So if the rpc cmd was
+      # string, then we need to conver to XML
+      if not rpc_cmd_e:
+        rpc_cmd_e = etree.XML( rpc_cmd )
 
-    return ret_rsp
+      raise RpcError( rpc_cmd_e, ret_rsp_e )
+
+    return ret_rsp_e
 
   ### ---------------------------------------------------------------------------
   ### RpcMaker: creates a new RpcMaker object bound to this WLC
@@ -304,8 +313,8 @@ class WirelessLanController(object):
   def close(self):
     """
       close performs any necessary object termination/cleanup
+      nada at the  moment
+      caller is responsible for closing the logfile (for now)
     """
-    if self._logfile:
-      self._logfile.close()
 
     return True
