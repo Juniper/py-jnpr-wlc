@@ -1,5 +1,6 @@
 # python stdlib
 import subprocess
+import os
 from urllib2 import Request
 from urllib2 import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
 from urllib2 import HTTPHandler, HTTPSHandler, build_opener
@@ -158,10 +159,10 @@ class WirelessLanController(object):
       attempts to ping the WLC device.  This only works on Unix systems that 
       has /bin/ping
     """
-
-    ping = subprocess.Popen(
-      ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
-      stdout=subprocess.PIPE) 
+    if os.uname()[0] == 'Linux':
+      ping = subprocess.Popen(
+        ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
+        stdout=subprocess.PIPE) 
 
     if 0 != ping.wait():
       raise RuntimeError("Unable to ping host: " + self._hostname)
