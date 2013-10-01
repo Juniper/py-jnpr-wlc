@@ -62,37 +62,6 @@ wlc.close()
   When you make a call to `open()` the method will retrieve bits of data about the WLC and store them
   into a dictionary called `facts`.  You can access this data as property, as illustrated:
 
-````python
->>> pprint( wlc.facts )
-{'auto-config': 'NO',
- 'backup-config-location': '',
- 'booted-config-location': 'configuration',
- 'booted-image-location': 'boot0:WC075106.8XX',
- 'booted-version': '7.5.1.6.0',
- 'bootflags': '',
- 'cluster-active-seed': 'NO',
- 'console-timeout': '0',
- 'domainsecurity': 'NONE',
- 'enablepw': 'b5bacf1baa8e028e858c134e3fd2d306cc3b',
- 'fips': 'NO',
- 'idle-timeout': '3600',
- 'ip-addr': '66.129.246.74',
- 'macaddress': '78:19:F7:70:96:76',
- 'model': 'WLC880R',
- 'mx-secret': '',
- 'name': 'WLC880R',
- 'next-config-location': 'configuration',
- 'next-image-location': 'boot0:WC075106.8XX',
- 'next-image-version': '7.5.1.6.0',
- 'objectid': '1.3.6.1.4.1.14525.3.3.1',
- 'platform': '802',
- 'serialnumber': 'JJ0211401124',
- 'tunnelsecurity': 'NONE',
- 'type': 'DP',
- 'uptime': '0'}
-
-````
-  boo!
 
 ## DEPENDENCIES
 
