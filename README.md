@@ -57,8 +57,13 @@ wlc.close()
 ````
   For more examples, see the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.
   
-### LICENSE
+## DEPENDENCIES
+
+  * [Python 2.7](http://www.python.org/)
+  * [lxml](http://lxml.de/index.html)
+
+## LICENSE
   Apache 2.0
 
-### CONTRIBUTORS
+## CONTRIBUTORS
   Jeremy Schulman, @nwkautomaniac
