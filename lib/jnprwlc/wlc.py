@@ -11,7 +11,8 @@ from lxml import etree
 
 # local public modules
 from jnprwlc.helpers import RpcHelper, std_rpc_helpers
-from jnprwlc.rpc_factory import RpcFactory
+from jnprwlc.factory import RpcFactory
+from jnprwlc.exception import RpcError
 from jnprwlc.builder import RpcMaker
 
 # jnprwlc internal modules
@@ -213,13 +214,15 @@ class WirelessLanController(object):
 
     rsp_e = etree.XML(self._http_api.open(req).read())
 
-    # @@@ should do common error checking here
-    # @@@ TBD ...
-
     # now return the XML element starting with the top of
     # the action response; i.e. the first child
 
-    return rsp_e[0] if len(rsp_e) else rsp_e
+    ret_rsp = rsp_e[0] if len(rsp_e) else rsp_e
+
+    if 'ERROR-RESP' == ret_rsp.tag:
+      raise RpcError( rpc_cmd, ret_rsp )
+
+    return ret_rsp
 
   ### ---------------------------------------------------------------------------
   ### RpcMaker: creates a new RpcMaker object bound to this WLC
