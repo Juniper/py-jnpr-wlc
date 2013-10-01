@@ -92,6 +92,8 @@ wlc.close()
  'uptime': '0'}
 
 ````
+  boo!
+
 ## DEPENDENCIES
 
   * [Python 2.7](http://www.python.org/)
