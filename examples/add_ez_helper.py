@@ -38,7 +38,7 @@ def system_services( wlc, *vargs, **kvargs ):
 ##### -------------------------------------------------------------------------
 
 # add this new routine to the WLC "ez" section.
-wlc.ez( system_services )
+wlc.ez( helper=system_services )
 
 # now call the service
 print "Retrieving System Services ..."
