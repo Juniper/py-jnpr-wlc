@@ -63,7 +63,7 @@ wlc.close()
 ````
   For more examples, see the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.
   
-## WLC "FACTS"
+## "FACTS"
 
   When you make a call to `open()` the method will retrieve bits of data about the WLC and store them
   into a dictionary called `facts`.  You can access this data as property, as illustrated:
