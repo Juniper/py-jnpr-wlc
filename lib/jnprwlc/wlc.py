@@ -1,3 +1,5 @@
+import pdb
+
 # python stdlib
 import subprocess
 import os
@@ -24,6 +26,9 @@ DEFAULT_PORT = 8889
 DEFAULT_API_URI = "/trapeze/ringmaster"
 DEFAULT_API_USER_AGENT = 'Juniper Networks RingMaster'
 DEFAULT_TIMEOUT = 3
+
+LOG_DBAR = '<!--' + '='*50 +'-->\n'
+LOG_SBAR = '<!--' + '-'*50 +'-->\n'
 
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
@@ -90,6 +95,36 @@ class WirelessLanController(object):
   def timeout(self, value):
       self._timeout = value
   
+  ### ---------------------------------------------------------------------------
+  ### property: logfile
+  ### ---------------------------------------------------------------------------
+
+  @property
+  def logfile(self):
+    """
+      simply returns the log file object
+    """
+    return self._logfile
+
+  @logfile.setter
+  def logfile(self, value):
+    """
+      assigns an opened file object to the WLC for logging
+      If there is an open logfile, and 'value' is None/False
+      then close the existing file
+    """
+    # got an existing file that we need to close
+    if (not value) and (None != self._logfile):
+      rc = self._logfile.close()
+      self._logfile = False
+      return rc
+
+    if not isinstance(value, file):
+      raise ValueError("RHS must be a file object")  
+
+    self._logfile = value
+    return self._logfile
+  
   # ===========================================================================
   #                                  CONSTRUCTOR
   # ===========================================================================
@@ -107,6 +142,7 @@ class WirelessLanController(object):
       - port: DEFAULT_PORT(8889)
       - timeout: DEFAULT_TIMEOUT(3)
       - http: DEFAULT_HTTP('https')
+      - logfile: False/file object
     """
     _rqd_args = 'host user password'.split()
 
@@ -124,6 +160,7 @@ class WirelessLanController(object):
     self._port = kvargs.get('port', DEFAULT_PORT)
     self._proto = kvargs.get('http', DEFAULT_HTTP)
     self._timeout = kvargs.get('timeout', DEFAULT_TIMEOUT)
+    self._logfile = kvargs.get('logfile', False)
     self._api_uri = None
 
     self._rpc_factory = RpcFactory()
@@ -187,6 +224,19 @@ class WirelessLanController(object):
     self.ez.facts()
     return self.facts
 
+
+  def _log_transaction( self, cmd_txt, rsp_txt ):
+    """
+      log the information as XML with comment/seprators
+    """
+    self._logfile.write(LOG_DBAR)
+    self._logfile.write(cmd_txt)
+    self._logfile.write('\n')
+    self._logfile.write(LOG_SBAR)
+    self._logfile.write(rsp_txt)
+    self._logfile.write('\n')
+    self._logfile.flush()
+
   ### ---------------------------------------------------------------------------
   ### execute(): executes an RPC command
   ### ---------------------------------------------------------------------------
@@ -209,11 +259,23 @@ class WirelessLanController(object):
     req.add_header("Authorization", "Basic %s" % self._auth_base64)
 
     if isinstance(rpc_cmd, str):
-      req.add_data('XML=' + rpc_cmd )
+      rpc_cmd_txt = rpc_cmd
     elif isinstance(rpc_cmd, etree._Element):
-      req.add_data('XML=' + etree.tostring( rpc_cmd ))
+      rpc_cmd_txt = etree.tostring( rpc_cmd )
+    else:
+      raise ValueError("Dont know what to do with rpc of type %s" % rpc_cmd.__class__.__name__)
 
-    rsp_e = etree.XML(self._http_api.open(req).read())
+    # bind XML data into HTTP request, issue the request, and get
+    # back the response as text
+
+    req.add_data('XML=' + rpc_cmd_txt)
+    rpc_rsp_txt = self._http_api.open(req).read()
+
+    if self._logfile:
+      self._log_transaction( rpc_cmd_txt, rpc_rsp_txt )
+
+    # covert string to XML for processing
+    rsp_e = etree.XML( rpc_rsp_txt)
 
     # now return the XML element starting with the top of
     # the action response; i.e. the first child
@@ -241,6 +303,9 @@ class WirelessLanController(object):
 
   def close(self):
     """
-      close doesn't do anything ... for now.
+      close performs any necessary object termination/cleanup
     """
+    if self._logfile:
+      self._logfile.close()
+
     return True
