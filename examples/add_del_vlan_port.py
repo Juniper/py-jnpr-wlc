@@ -7,9 +7,9 @@ from jinja2 import Template
 
 wlc = WLC_login()
 
-cmd = wlc.RpcMaker('set')
+rpc = wlc.RpcMaker('set')
 
-cmd.data = E('VLAN-TABLE', E.VLAN({'number':'40'}, E('VLAN-MEMBER-TABLE')))
+rpc.data = E('VLAN-TABLE', E.VLAN({'number':'40'}, E('VLAN-MEMBER-TABLE')))
 at_table = cmd.data.find('.//VLAN-MEMBER-TABLE')
 
 vlan_port_j2 = Template(u"""
@@ -27,11 +27,11 @@ for port in ['2','3']:
 
 # if we want to add the ports, we do the following
 
-# r = cmd()
+# r = rpc()
 
 # if we want to remove the ports, we do the following
 
-# cmd.trans = 'delete'
+# rpc.cmd = 'delete'
 # r = cmd()
 
 # viola!

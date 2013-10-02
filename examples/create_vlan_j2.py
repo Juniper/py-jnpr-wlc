@@ -37,7 +37,7 @@ vlan_vars = {
 
 cr8_vlan_xml = j2_to_xml( 'create-vlan.j2.xml', vlan_vars )
 
-trans = wlc.RpcMaker( trans='SET', target='vlan-table' )
+trans = wlc.RpcMaker( 'SET', 'vlan-table' )
 trans.data = cr8_vlan_xml
 
 # now perform the transaction

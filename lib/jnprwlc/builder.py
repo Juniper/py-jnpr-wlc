@@ -24,19 +24,19 @@ class RpcMaker(object):
       self._factory = self._wlc._rpc_factory
   
   # ---------------------------------------------------------------------------
-  # property: trans
+  # property: cmd
   #    one of the values in the TRANSACTIONS_LIST
   # ---------------------------------------------------------------------------
 
   @property
-  def trans(self):
-    return self._trans
+  def cmd(self):
+    return self._cmd
 
-  @trans.setter
-  def trans(self, value):
+  @cmd.setter
+  def cmd(self, value):
     value = value.upper()
     assert (value in TRANSACTIONS_LIST)
-    self._trans = value
+    self._cmd = value
 
   # ---------------------------------------------------------------------------
   # property: target
@@ -55,6 +55,7 @@ class RpcMaker(object):
   # ---------------------------------------------------------------------------
   # property: args
   #    target arguments, dict
+  # @@@ TODO: remove this? since not really doing anything special here
   # ---------------------------------------------------------------------------  
 
   @property
@@ -95,17 +96,17 @@ class RpcMaker(object):
   #                                  CONSTRUCTOR
   # ===========================================================================
 
-  def __init__(self, wlc, trans='GET', target=None, *vargs, **kvargs ):
+  def __init__(self, wlc, cmd='GET', target=None, *vargs, **kvargs ):
     """
       wlc: should be the WLC object so we can self-invoke the RPC
       trans: transaction type from TRANSACTIONS_LIST
       target: target API object, optional
     """
     self.wlc = wlc
-    self.trans = trans
+    self.cmd = cmd
     self.target = target
     self.data = None
-    self.args = kvargs
+    self.args = kvargs if kvargs else {}
 
   # ---------------------------------------------------------------------------
   # property: as_rpc
@@ -117,7 +118,7 @@ class RpcMaker(object):
     """
       creates the actual RPC from the associated properties
     """
-    rpc_e, trans_e = self._factory( self._trans, self._target )
+    rpc_e, trans_e = self._factory( self._cmd, self._target )
 
     # if there is a target, then add that child element and
     # bind any associated target args

@@ -85,17 +85,23 @@ class RpcHelper(object):
         raise AttributeError("Unknown ez helper: '%s'" % method)
       return _no_method_fn
 
-    # otherwise, return a function that will in turn
+    # otherwise, return a closure that will in turn
     # invoke the helper function passing the associated
     # WLC object and called arguments
 
     def _helper_fn(*vargs, **kvargs):
       return method_fn(self._wlc, vargs, **kvargs)
+
+    # cleverly metabind the function help, yo! 
+    _helper_fn.__doc__ = method_fn.__doc__
+    _helper_fn.__name__ = method_fn.__name__
+
+    # return the function for later execution
     return _helper_fn
 
   def _create_child( self, options ):
     name = options['child']
-    new_helper = self.__class__(self._wlc, options.get('load'))
+    new_helper = self.__class__(self._wlc, options.get('helpers'))
     self._children[name] = new_helper
     return new_helper
 
@@ -113,8 +119,8 @@ class RpcHelper(object):
         set the name of the ez function rather than taking
         it from <function>.__name__
 
-      ( child=<name>, load=<dict> ):
-        Creates a child helper object.  If load is provided
+      ( child=<name>, helpers=<dict> ):
+        Creates a child helper object.  If helpers is provided
         then that dictory of name/helpers is also loaded into 
         the new child RpcHelper.  The child is returned.
     """
