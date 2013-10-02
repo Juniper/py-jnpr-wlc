@@ -93,6 +93,23 @@ wlc.close()
 
 ````
 
+## WLC Class Methods
+
+  There are really only three significant call methods: `open`, `execute`, and `close`.  open sets up the HTTP/s transport internals and verifies authentication credentials. close performs any necessary object cleanup. execute transmits an XML RPC and return back the XML response
+  
+  While you can use the `execute` method to perform RPC transactions, you will generally use
+  the `rpc` attribute to metaprogram so you don't need to hassle with a lot of XML generation.  If you
+  want to do all the hard lifting of building the complete XML transaction, you can either use the
+  class `execute` method, or make a call on the `rpc`, like so:
+  
+````
+  # Assume rpc_cmd is a complete WLC XML TRANSACTION.  The following two
+  # approaches are equivalent:
+  
+  rpc_rsp = wlc.rpc( rpc_cmd )
+  rpc_rsp = wlc.execute( rpc_cmd )
+````
+
 ## RPC METAPROGRAMMING
 
   You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
