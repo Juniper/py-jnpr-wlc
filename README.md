@@ -95,7 +95,7 @@ wlc.close()
 
 ## WLC Class Methods
 
-  There are really only three significant call methods: `open`, `execute`, and `close`.  open sets up the HTTP/s transport internals and verifies authentication credentials. close performs any necessary object cleanup. execute transmits an XML RPC and return back the XML response
+  There are really only three significant class methods: `open`, `execute`, and `close`.  open sets up the HTTP/s transport internals and verifies authentication credentials. close performs any necessary object cleanup. execute transmits an XML RPC and return back the XML response
   
   While you can use the `execute` method to perform RPC transactions, you will generally use
   the `rpc` attribute to metaprogram so you don't need to hassle with a lot of XML generation.  If you
