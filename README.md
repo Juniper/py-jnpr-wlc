@@ -21,27 +21,13 @@ wlc = WLC( user='jeremy', host='192.168.10.27', password='logmeIn' )
 # auth/login to WLC device
 wlc.open()
 
+# -----------------------------------------------------
+# Get all VLANS
+# -----------------------------------------------------
 # Retrieve the current VLANs and display them.  The RPC
 # invocation here is metaprogramming.  The `rpc` object
-# metraprograms whatever comes after, using the following
-# conventions:
-#
-#    wlc.rpc.get_xyz()        -- GET
-#    wlc.rpc.get_stat_xyz()   -- GET-STAT
-#    wlc.rpc.act_xyz()        -- ACT
-#    wlc.rpc.delete_xyz()     -- DELETE (ACT+DELETE)
-#    wlc.rpc.set_xyz()        -- SET (for basic things)
-#
-#    Note: For more complicated create/set metaprogramming
-#          you would use the wlc.RpcMaker() object.
-#          Documentation on that to follow shortly, but
-#          you can see examples in the example directory
-#
-# The response is an lxml Element
-
-# -------------------------------------------
-# Get all VLANS
-# -------------------------------------------
+# metraprograms whatever comes afte.  The response is 
+# an lxml Element
 
 vlans = wlc.rpc.get_vlan()
 
@@ -50,9 +36,9 @@ for vlan in vlans.xpath('VLAN'):
   v_name = vlan.attrib['name']
   print "VLAN(%s) is named: %s" % (v_num, v_name)
 
-# -------------------------------------------
+# -----------------------------------------------------
 # Get only one VLAN
-# -------------------------------------------
+# -----------------------------------------------------
 
 resp = wlc.rpc.get_vlan( name="VoIP" )
 vlan = resp.find('VLAN')
@@ -107,13 +93,45 @@ wlc.close()
 
 ````
 
-## METAPROGRAMMING
+## RPC METAPROGRAMMING
 
-   
+  You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
+  Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
+  having to maintain a specific set of functions.  The benefit of this approach is that the module will
+  work with any version of the WLC; i.e. there is no static binding to specific WLC XML libraries.
+  
+  For _simple_ XML RPCs, you can do following way:
 
-#### Using `rpc.<cmd>_<target>(<attribs>)` to metaprogram RPC calls
-#### Using `RpcMaker()` to metaprogram RPC calls
-#### Using `rpc()` to execute existing RPCs
+````  
+    rsp = wlc.rpc.<cmd>_<target>( <attribs> )
+    
+    <cmd>: get, act, delete
+    <target>: a target specified in the WLC XML DTD
+    <attribs>: name=value pairs that are set within the <target> element
+````    
+
+  For example, let's say that you want to perform the "GET" command on a "VLAN" target and set
+  the VLAN attribute 'name' to the value 'Jeremy'.  You would do the following:
+  
+````
+  rsp = wlc.rpc.get_vlan( name="Jeremy" )
+````
+
+  Simple!  The return value, `rsp`, is an etree Element.  You can dump this to the screen for debugging:
+  
+```
+  from lxml import etree
+  
+  etree.tostring(rsp, pretty_print=True)
+```
+
+  A _simple_ RPC is one that doesn't contain any further XML beyond the <target> element.  
+  
+  If you need to a _complex_ RPC, i.e. one that has XML elements within the <target> element, then you can use
+  the `RpcMaker` mechanism.  You will generally need to use this mechanism when you want to create 
+  things (like a VLAN), or set things within other things (like ports within a VLAN).  There are some
+  examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.
+
 
 ## DEPENDENCIES
 
