@@ -97,8 +97,7 @@ wlc.close()
 
   You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
   Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
-  having to maintain a specific set of functions.  The benefit of this approach is that the module will
-  work with any version of the WLC; i.e. there is no static binding to specific WLC XML libraries.
+  having to maintain a static set of function bound to a specifc WLC release of code.
   
   For _simple_ XML RPCs, you can do following way:
 
