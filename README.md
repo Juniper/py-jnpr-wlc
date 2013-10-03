@@ -1,8 +1,9 @@
 # ABOUT
 
-  Python module for Juniper Wireless Lan Controller (WLC) product
+  Python module for Juniper Wireless LAN Controller (WLC)
 
-**STATUS**: Experimental, under active development.  The WLC XML API is not public, but can be made available to existing customers.
+**STATUS**: Experimental, under active development.  
+The WLC XML API is not public, but can be made available to existing customers.
 
 # OVERVIEW
 
@@ -20,27 +21,13 @@ wlc = WLC( user='jeremy', host='192.168.10.27', password='logmeIn' )
 # auth/login to WLC device
 wlc.open()
 
+# -----------------------------------------------------
+# Get all VLANS
+# -----------------------------------------------------
 # Retrieve the current VLANs and display them.  The RPC
 # invocation here is metaprogramming.  The `rpc` object
-# metraprograms whatever comes after, using the following
-# conventions:
-#
-#    wlc.rpc.get_xyz()        -- GET
-#    wlc.rpc.get_stat_xyz()   -- GET-STAT
-#    wlc.rpc.act_xyz()        -- ACT
-#    wlc.rpc.delete_xyz()     -- DELETE (ACT+DELETE)
-#    wlc.rpc.set_xyz()        -- SET (for basic things)
-#
-#    Note: For more complicated create/set metaprogramming
-#          you would use the wlc.RpcMaker() object.
-#          Documentation on that to follow shortly, but
-#          you can see examples in the example directory
-#
-# The response is an lxml Element
-
-# -------------------------------------------
-# Get all VLANS
-# -------------------------------------------
+# metraprograms whatever comes afte.  The response is 
+# an lxml Element
 
 vlans = wlc.rpc.get_vlan()
 
@@ -49,9 +36,9 @@ for vlan in vlans.xpath('VLAN'):
   v_name = vlan.attrib['name']
   print "VLAN(%s) is named: %s" % (v_num, v_name)
 
-# -------------------------------------------
+# -----------------------------------------------------
 # Get only one VLAN
-# -------------------------------------------
+# -----------------------------------------------------
 
 resp = wlc.rpc.get_vlan( name="VoIP" )
 vlan = resp.find('VLAN')
@@ -63,7 +50,7 @@ wlc.close()
 ````
   For more examples, see the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.
   
-## WLC Facts
+## "FACTS"
 
   When you make a call to `open()` the method will retrieve bits of data about the WLC and store them
   into a dictionary called `facts`.  You can access this data as property, as illustrated:
@@ -106,13 +93,61 @@ wlc.close()
 
 ````
 
-## METAPROGRAMMING API
+## WLC Class Methods
 
-   
+  There are really only three significant class methods: `open`, `execute`, and `close`.  open sets up the HTTP/s transport internals and verifies authentication credentials. close performs any necessary object cleanup. execute transmits an XML RPC and return back the XML response
+  
+  While you can use the `execute` method to perform RPC transactions, you will generally use
+  the `rpc` attribute to metaprogram so you don't need to hassle with a lot of XML generation.  If you
+  want to do all the hard lifting of building the complete XML transaction, you can either use the
+  class `execute` method, or make a call on the `rpc`, like so:
+  
+````
+  # Assume rpc_cmd is a complete WLC XML TRANSACTION.  The following two
+  # approaches are equivalent:
+  
+  rpc_rsp = wlc.rpc( rpc_cmd )
+  rpc_rsp = wlc.execute( rpc_cmd )
+````
 
-#### Using `rpc.<cmd>_<target>(<attribs>)` to metaprogram RPC calls
-#### Using `RpcMaker()` to metaprogram RPC calls
-#### Using `rpc()` to execute existing RPCs
+## RPC METAPROGRAMMING
+
+  You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
+  Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
+  having to maintain a static set of function bound to a specifc WLC release of code.
+  
+  For _simple_ XML RPCs, you can do following way:
+
+````  
+    rsp = wlc.rpc.<cmd>_<target>( <attribs> )
+    
+    <cmd>: get, act, delete
+    <target>: a target specified in the WLC XML DTD
+    <attribs>: name=value pairs that are set within the <target> element
+````    
+
+  For example, let's say that you want to perform the "GET" command on a "VLAN" target and set
+  the VLAN attribute 'name' to the value 'Jeremy'.  You would do the following:
+  
+````
+  rsp = wlc.rpc.get_vlan( name="Jeremy" )
+````
+
+  Simple!  The return value, `rsp`, is an etree Element.  You can dump this to the screen for debugging:
+  
+```
+  from lxml import etree
+  
+  etree.tostring(rsp, pretty_print=True)
+```
+
+  A _simple_ RPC is one that doesn't contain any further XML beyond the <target> element.  
+  
+  If you need to a _complex_ RPC, i.e. one that has XML elements within the <target> element, then you can use
+  the `RpcMaker` mechanism.  You will generally need to use this mechanism when you want to create 
+  things (like a VLAN), or set things within other things (like ports within a VLAN).  There are some
+  examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.  I'd suggest starting with this [one](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/add_del_vlan_port.py)
+
 
 ## DEPENDENCIES
 
