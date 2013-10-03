@@ -12,6 +12,10 @@ rpc = wlc.RpcMaker('set')
 rpc.data = E('VLAN-TABLE', E.VLAN({'number':'40'}, E('VLAN-MEMBER-TABLE')))
 at_table = cmd.data.find('.//VLAN-MEMBER-TABLE')
 
+###
+### create a jinja2 template so we can insert VLAN-MEMBER elements into the command
+###
+
 vlan_port_j2 = Template(u"""
   <VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
     <PORT-REF type="PORT">
