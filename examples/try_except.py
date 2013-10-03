@@ -3,7 +3,7 @@ import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
 
-from jnprwlc.exception import RpcError as WLCError
+from jnprwlc import RpcError as WLCError
 
 wlc = WLC_login()
 
