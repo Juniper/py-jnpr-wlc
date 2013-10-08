@@ -29,7 +29,9 @@ dap_j2 = Template(u"""
         <RADIO-PROFILE-REF name="{{ radio1profile }}"/>
       </AP-RADIO>
       <AP-RADIO antenna-mode="DUAL-BAND-3SS" antennatype="INTERNAL" auto-config="YES" 
-        channel="36" designation="INDOOR" enable="YES" external-antennas="0" force-rebalance="NO" load-balance-enable="YES" load-balance-group="" max-tuned-power="default" min-tx-rate="" slot="2" tx-power="11" type="NA">
+        channel="36" designation="INDOOR" enable="YES" external-antennas="0" 
+        force-rebalance="NO" load-balance-enable="YES" load-balance-group="" 
+        max-tuned-power="default" min-tx-rate="" slot="2" tx-power="11" type="NA">
         <RADIO-PROFILE-REF name="{{ radio2profile }}"/>
       </AP-RADIO>
     </AP-RADIO-TABLE>
