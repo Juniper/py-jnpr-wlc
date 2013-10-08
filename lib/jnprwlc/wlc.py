@@ -200,7 +200,11 @@ class WirelessLanController(object):
       ping = subprocess.Popen(
         ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
         stdout=subprocess.PIPE) 
-
+    elif os.uname()[0] == 'Darwin':
+      ping = subprocess.Popen(
+        ["/sbin/ping", "-c1", "-W"+str(self._timeout), self._hostname],
+        stdout=subprocess.PIPE)  
+         
     if 0 != ping.wait():
       raise RuntimeError("Unable to ping host: " + self._hostname)
 
