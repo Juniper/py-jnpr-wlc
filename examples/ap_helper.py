@@ -4,69 +4,45 @@ from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
 import jinja2
 from lxml import etree
+from lxml.builder import E
 
 wlc = WLC_login()
 
-def show_vlans( wlc, *vargs, **kvargs ):
-
-  if 'name' in kvargs:
-    vlan_xml = wlc.rpc.get_vlan( name = kvargs['name'])
-  else:
-    vlan_xml = wlc.rpc.get_vlan()
-
-  return [ dict(vlan.attrib) for vlan in vlan_xml.xpath('VLAN')]
-  
-  
+   
 def show_ap( wlc, *vargs, **kvargs ):
-  if 'number' in kvargs:
-    ap_xml = wlc.rpc.get_vlan( name = kvargs['name'])
-  else:
-    vlan_xml = wlc.rpc.get_vlan()
+    # XXX - fix this to add ap statistics elements to the dict
+    # XXX - add a filter for displaying ap details for an AP by name or serial
+    run_list = [ wlc.rpc.get_stat_ap_radio_status ]
 
-  return [ dict(vlan.attrib) for vlan in vlan_xml.xpath('VLAN')]
+    data = {}
+    for rpc in run_list:
+        rsp = rpc()    
+        ap_list = rsp.findall('.//DAP')
+        for ap in ap_list:
+            data[ap.get('apnum')] = {}
+            data[ap.get('apnum')].update(ap.attrib)
+      
+    return data
+  
     
-  
-  
-##### -------------------------------------------------------------------------
-##### MAIN BLOCK
-##### -------------------------------------------------------------------------
+def boot_ap( wlc, *vargs, **kvargs ):
+    # XXX - add a filter for booting AP by name or serial
+    rpc = wlc.RpcMaker('act')
+    
+    rpc.data = E('BOOT', E('BOOT-DAP', E('DAP-REF')))
 
-j2_ldr = jinja2.FileSystemLoader( searchpath='.' )
-j2_env = jinja2.Environment( loader=j2_ldr )
+    if 'apnum' in kvargs:
+        dapref = rpc.data.find('.//DAP-REF')
+        dapref.set('dap-id', kvargs['apnum'])
+        
+        r = rpc()
+    else:
+        raise ValueError("You must provide an AP number")
 
-def j2_to_xml( filename, env_vars ):
-  """
-    render jinja2 template into XML
-  """
-  # build the j2 template
-  template = j2_env.get_template( filename )
-  # now merge the template with the vars
-  as_txt = template.render( env_vars )
-  # now convert the txt to XML
-  return etree.XML( as_txt )
+    return True
 
-def create_vlan( wlc, *vargs, **kvargs ):
-  vlan_vars = {
-    'name': kvargs['name'],
-    'number': kvargs['number']
-  }
-  rpc = wlc.RpcMaker( trans='SET', target='vlan-table' )
-  rpc.data = j2_to_xml( 'create-vlan.j2.xml', vlan_vars )
-  return wlc.rpc( rpc.as_xml )
 
 # bind the helper to the WLC
-wlc.ez( helper=show_vlans )
-wlc.ez( helper=create_vlan )
-
-vlan_create_list = [
-  {'name': 'Bob1', 'number': '1001'},
-  {'name': 'Bob2', 'number': '1002'},
-  {'name': 'Bob3', 'number': '1003'},
-  {'name': 'Bob4', 'number': '1004'},
-  {'name': 'Bob5', 'number': '1005'},
-]
-  
-# then you could do something like:
-#>>> for vlan in vlan_create_list:
-#...    wlc.ez.create_vlan( **vlan )
+wlc.ez( helper=show_ap )
+wlc.ez( helper=boot_ap )
 
