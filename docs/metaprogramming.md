@@ -56,7 +56,7 @@ print "Settting ports on VLAN ..."
 rsp = rpc()
 ````
 
-The return value is an RpcMaker opject.  As you can see from the above example, the rpc object is callable; and in doing so will invite the RPC and return the result as an lxml Element.  See Examples below.
+The return value is an RpcMaker opject.  As you can see from the above example, the rpc object is callable; and in doing so will execute the RPC and return the result as an lxml Element.  See Examples below.
 
 ## RpcMaker Properties
 
