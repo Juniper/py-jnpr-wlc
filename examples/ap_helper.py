@@ -10,17 +10,13 @@ wlc = WLC_login()
 
    
 def show_ap( wlc, *vargs, **kvargs ):
-    # XXX - fix this to add ap statistics elements to the dict
-    # XXX - add a filter for displaying ap details for an AP by name or serial
-    run_list = [ wlc.rpc.get_stat_ap_radio_status ]
-
+    rsp = wlc.rpc.get_stat_ap_radio_status()
+    ap_list = rsp.findall('.//DAP')
     data = {}
-    for rpc in run_list:
-        rsp = rpc()    
-        ap_list = rsp.findall('.//DAP')
-        for ap in ap_list:
-            data[ap.get('apnum')] = {}
-            data[ap.get('apnum')].update(ap.attrib)
+    
+    for ap in ap_list:
+        data[ap.get('apnum')] = {}
+        data[ap.get('apnum')].update(ap.attrib)
       
     return data
   

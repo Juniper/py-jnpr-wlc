@@ -1,8 +1,5 @@
 *.py[cod]
 
-# XML files
-*.xml
-
 # C extensions
 *.so
 

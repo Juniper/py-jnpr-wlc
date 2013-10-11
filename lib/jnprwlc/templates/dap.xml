@@ -1,0 +1,35 @@
+<!-- VARIABLES:                                                      -->
+<!--   apnum: AP number                                              -->
+<!--   fp: AP fingerprint                                            -->
+<!--   model: AP model                                               -->
+<!--   name: AP name                                                 -->
+<!--   port: port number                                             -->
+<!--   serial: serial-id                                             -->
+<!--   radio1profile: slot 1 radio profile name                       -->
+<!--   radio2profile: slot 2 radio profile name                      -->
+
+<DAP apnum="{{ apnum }}" fingerprint="{{ fp }}" model="{{ model }}" name="{{ name }}" 
+    port="{{ port }}" serial-id="{{ serial }}" type="NG">
+  <AP-BOOTCONFIG boot-image=""/>
+  <AP-RADIO-TABLE>
+    <AP-RADIO antenna-mode="DUAL-BAND-3SS" antennatype="INTERNAL" auto-config="YES" 
+        channel="6" designation="INDOOR" enable="YES" external-antennas="0" 
+        force-rebalance="NO" load-balance-enable="YES" load-balance-group="" 
+        max-tuned-power="default" min-tx-rate="" slot="1" tx-power="21" type="NG">
+      <RADIO-PROFILE-REF name="{{ radio1profile }}"/>
+    </AP-RADIO>
+    <AP-RADIO antenna-mode="DUAL-BAND-3SS" antennatype="INTERNAL" auto-config="YES" 
+      channel="36" designation="INDOOR" enable="YES" external-antennas="0" 
+      force-rebalance="NO" load-balance-enable="YES" load-balance-group="" 
+      max-tuned-power="default" min-tx-rate="" slot="2" tx-power="11" type="NA">
+      <RADIO-PROFILE-REF name="{{ radio2profile }}"/>
+    </AP-RADIO>
+  </AP-RADIO-TABLE>
+  <AP-ETHERNET-TABLE/>
+  <APINFO>
+    <APCONTACT/>
+    <APLOCATION/>
+    <APDESCRIPTION/>
+  </APINFO>    
+  <VLAN-PROFILE-REF name=""/>
+</DAP> 

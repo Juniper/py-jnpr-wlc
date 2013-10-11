@@ -11,6 +11,7 @@ import base64
 
 # 3rd-party modules
 from lxml import etree
+import jinja2
 
 # local public modules
 from jnprwlc.helpers import RpcHelper, std_rpc_helpers
@@ -26,9 +27,15 @@ DEFAULT_PORT = 8889
 DEFAULT_API_URI = "/trapeze/ringmaster"
 DEFAULT_API_USER_AGENT = 'Juniper Networks RingMaster'
 DEFAULT_TIMEOUT = 3
+DEFAULT_TEMPLATE_PATH = ".:"+os.path.dirname(__file__)+"/templates"
 
 LOG_DBAR = '<!--' + '='*50 +'-->\n'
 LOG_SBAR = '<!--' + '-'*50 +'-->\n'
+
+
+# create a global Jinja2 environment
+
+_RpcJinja2 = jinja2.Environment(loader=jinja2.FileSystemLoader( DEFAULT_TEMPLATE_PATH.split(':') ))
 
 ### ---------------------------------------------------------------------------
 ### ===========================================================================
@@ -143,6 +150,7 @@ class WirelessLanController(object):
       - timeout: DEFAULT_TIMEOUT(3)
       - http: DEFAULT_HTTP('https')
       - logfile: False/file object
+      - templatepath: str/path-list
     """
     _rqd_args = 'host user password'.split()
 
@@ -166,6 +174,8 @@ class WirelessLanController(object):
     self._rpc_factory = RpcFactory()
     self.rpc = _RpcMetaExec(self, self._rpc_factory)
     self.ez = RpcHelper(self, load_helpers=std_rpc_helpers)
+
+    self._rpc_j2 = _RpcJinja2
 
   ### ---------------------------------------------------------------------------
   ### _setup_http: used to create/setup HTTP transport mechanism
@@ -301,16 +311,6 @@ class WirelessLanController(object):
     return ret_rsp_e
 
   ### ---------------------------------------------------------------------------
-  ### RpcMaker: creates a new RpcMaker object bound to this WLC
-  ### ---------------------------------------------------------------------------
-
-  def RpcMaker( self, trans='GET', target=None, *vargs, **kvargs ):
-    """
-      creates a new RpcMaker object bound to this WLC
-    """
-    return RpcMaker( self, trans, target, vargs, **kvargs )
-
-  ### ---------------------------------------------------------------------------
   ### close(): nada, placeholder for future 'cleanup on close'
   ### ---------------------------------------------------------------------------
 
@@ -322,3 +322,30 @@ class WirelessLanController(object):
     """
 
     return True
+
+  ### ---------------------------------------------------------------------------
+  ### RpcMaker: creates a new RpcMaker object bound to this WLC
+  ### ---------------------------------------------------------------------------
+
+  def RpcMaker( self, cmd='GET', target=None, **kvargs ):
+    """
+      creates a new RpcMaker object bound to this WLC
+    """
+    return RpcMaker( self, cmd, target, **kvargs )
+
+  ### ---------------------------------------------------------------------------
+  ### Template: retrieves a Jinja2 template
+  ### ---------------------------------------------------------------------------
+
+  def Template( self, filename ):
+
+    # templates are XML files, and the assumption here is that they will
+    # have .xml extensions.  if the caller doesn't include any extension
+    # be kind and add '.xml' for them
+
+    if os.path.splitext(filename)[1] == '':
+      filename = filename + '.xml'
+
+    return self._rpc_j2.get_template( filename )
+
+

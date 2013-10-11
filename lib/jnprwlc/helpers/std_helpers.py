@@ -1,9 +1,8 @@
 from .wlc_getfacts import wlc_getfacts
-
-## anything included in the 'std_rpc_helpers' will automatically
-## be added to the WLC 'ez' attribute when the WLC object is
-## initially created. 
+from .wlc_config import *
 
 std_rpc_helpers = {
-  'facts': wlc_getfacts
+  'facts': wlc_getfacts,
+  'save_config' : wlc_save_config,
+  'get_config' : wlc_get_config
 }
