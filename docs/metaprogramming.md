@@ -56,7 +56,7 @@ print "Settting ports on VLAN ..."
 rsp = rpc()
 ````
 
-The return value is an RpcMaker opject.  As you can see from the above example, the rpc object is callable; and in doing so will execute the RPC and return the result as an lxml Element.  See Examples below.
+The return value is an RpcMaker opject.  As you can see from the above example, the rpc object is callable; and in doing so will execute the RPC and return the result as an lxml Element.
 
 ## RpcMaker Properties
 
@@ -118,9 +118,34 @@ standard lxml mechanism.  This includes using lxml.builder ElementMaker, for exa
 
 If you want to use `data` as a container of a list of things, you can setup data initially and then append items into is.  For an example of this technique, please see [this](../examples/ap_convert_auto_2.py) script.
 
+Another common task is to append things to the `data` property.  This would be common if you were creating a table of
+something, like a VLAN-TABLE or a DAP-TABLE.  In this case you can use the `data_append()` method.  This is different
+from simply using the native XML append() method.  The `data_append()` will take the provided data and convert it from a string-XML to an Element before appending it to the `data`.  This technique is also illustrated in the same example.
+
 #### template
 
-For using jinja2 templates, see the [Templating](#rendering-templates) section below.
+You can use the `template` property to assign either a template file-name or a jinja2 Template instance to the RPC.  When the template is rendered, the value is assigned (over-writes) the `data` property.  So this way you can
+create a single rpc and render the _innerds_ multiple times on different data sets. yo!
+
+Here is a simple example of using the `template` property:
+````python
+vlan_vars = dict(
+  number = 100,
+  ports = [
+    dict(port=2, tag=50),
+    dict(port=3)
+  ]
+)
+
+rpc = wlc.RpcMaker('set')
+rpc.template = 'vlan_set_ports'           # example assignment based on file-name
+rpc.render( vlan_vars )
+
+# execute command
+rsp = rpc()
+
+````
+
 #### to_xml
 
 When you use the `to_xml` property, the rpc object will construct the complete RPC tranaction and return an lxml Element structure.  At the time of generation the TRANSACTION tid value is incremented.  So if you make three invcations to `to_xml` you will get three different tid values.
@@ -142,5 +167,5 @@ print rpc
 ````
 ... and get the same results :-)
 
-## Rendering Templates
+
 
