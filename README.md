@@ -150,5 +150,6 @@ wlc.close()
   Apache 2.0
 
 ## CONTRIBUTORS
-  Jeremy Schulman, @nwkautomaniac
-  Tim McCarthy
+
+  * Jeremy Schulman, @nwkautomaniac
+  * Tim McCarthy
