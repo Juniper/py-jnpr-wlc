@@ -139,7 +139,7 @@ wlc.close()
 
 Each WLC object has an `ez` attribute that can be used to attach helper functions or packages.  The purpose of these functions is provide natural Python language bindings around the WLC XML API so that the results are not XML, but native types, like dictionaries.
 
-There are a few _builtin_ helper functions that are autoinstalled as part of every WLC object.  For details, refer to the [helper](lib/jnprwlc/helper) directory.
+There are a few _builtin_ helper functions that are autoinstalled as part of every WLC object.  For details, refer to the [helper](lib/jnprwlc/helpers) directory.
 
 ## LOGGING
 
