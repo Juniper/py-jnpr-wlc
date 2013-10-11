@@ -112,3 +112,22 @@ rsp = rpc()
 
 #### to_xml
 
+When you use the `to_xml` property, the rpc object will construct the complete RPC tranaction and return an lxml Element structure.  At the time of generation the TRANSACTION tid value is incremented.  So if you make three invcations to `to_xml` you will get three different tid values.
+
+Here's an example on how to "pretty print" an rpc manually:
+
+````python
+from lxml import etree
+
+rpc = wlc.RpcMaker(...)
+# more stuff to setup the rpc object ...
+
+etree.tostring( rpc.to_xml, pretty_print=True )
+````
+
+However, the RpcMaker class also defines `__repr__` so you can just as easily do:
+````python
+print rpc
+````
+... and get the same results :-)
+
