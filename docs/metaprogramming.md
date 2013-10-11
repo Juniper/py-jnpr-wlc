@@ -22,4 +22,22 @@ resp = wlc.rpc.get_vlan( name="default" )
 
 # Complex RPC
 
-To perform complex RPcs, using the `RpcMaker` method.
+To perform complex RPcs, using the `RpcMaker` method.  The usage format for `RpcMaker` is as follows:
+````
+   rpc = wlc.RpcMaker( <cmd>, [<target>], [**kvargs] )
+````
+Where:
+   * `cmd` is one of ['set','get','get-stat','act','delete']
+   * `target` is a known target defined by the API DTD files
+   * ``**kvargs`` are option key/value arguments
+
+There are two _well known_ kvargs:
+   * `Template` idendifies a template file to use
+   * `TemplateVars` is a dictionary of variables to render into the Template (optional)
+
+Any other kvargs are considered attributes to the `target` element.
+
+The return value is an RpcMaker opject.  The rpc is callable; and in doing so will invite the RPC and return the result as an lxml Element.  See Examples below.
+
+## RpcMaker Properties
+
