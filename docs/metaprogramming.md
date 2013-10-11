@@ -65,6 +65,7 @@ An rpc object has the following properties you can access:
    * `target` is a known target defined by the API DTD files
    * `args` is a dictionary of attributes applied to target
    * `data` is an lxml Element structure of XML
+   * `template` is a name of a jinja2 template file
    * `to_xml` is a property that returns the rpc object as a complete RPC etree XML
 
 #### cmd
@@ -110,6 +111,16 @@ rsp = rpc()
 
 #### data
 
+The `data` property allows you direct access to any XML body content.  If you've set the `target` property, then the data is within the target.  If you haven't set `target` then data is everything under the specific command.
+
+The `data` property is natively managed as an lxml Element.  So you can make assignements to it directly using
+standard lxml mechanism.  This includes using lxml.builder ElementMaker, for example.
+
+If you want to use `data` as a container of a list of things, you can setup data initially and then append items into is.  For an example of this technique, please see [this](../examples/ap_convert_auto_2.py) script.
+
+#### template
+
+For using jinja2 templates, see the [Templating](#rendering-templates) section below.
 #### to_xml
 
 When you use the `to_xml` property, the rpc object will construct the complete RPC tranaction and return an lxml Element structure.  At the time of generation the TRANSACTION tid value is incremented.  So if you make three invcations to `to_xml` you will get three different tid values.
@@ -130,4 +141,6 @@ However, the RpcMaker class also defines `__repr__` so you can just as easily do
 print rpc
 ````
 ... and get the same results :-)
+
+## Rendering Templates
 
