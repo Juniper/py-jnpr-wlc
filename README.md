@@ -135,6 +135,18 @@ wlc.close()
   examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.  I'd suggest starting with this [one](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/vlan_add_ports.py).
 
 
+## "EZ" MICROFRAMEWORK
+
+Each WLC object has an `ez` attribute that can be used to attach helper functions or packages.  The purpose of these functions is provide natural Python language bindings around the WLC XML API so that the results are not XML, but native types, like dictionaries.
+
+There are a few _builtin_ helper functions that are autoinstalled as part of every WLC object.  For details, refer to the [helpers](lib/jnprwlc/helpers) directory.
+
+Here is an example using the builin helper to save the configuration:
+````python
+wlc.ez.save_config()
+````
+
+For more details on using the "EZ" framework, see [here](docs/ez_framework.md).
 ## LOGGING
 
 Each WLC instance can support transaction logging.  You can use this facility by assigning an open file to the WLC instance, for example:
