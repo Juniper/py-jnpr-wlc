@@ -1,32 +1,7 @@
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
-import jinja2
-from lxml import etree
-
-from jnprwlc import WirelessLanController as WLC
 
 wlc = WLC_login()
-
-### ---------------------------------------------------------------------------
-### Technique that uses Jinja2 templating engine to create the XML RPC command
-### to create a new VLAN
-### ---------------------------------------------------------------------------
-
-j2_ldr = jinja2.FileSystemLoader( searchpath='.' )
-j2_env = jinja2.Environment( loader=j2_ldr )
-
-# -----------------------------------------------------------------------------
-
-def j2_to_xml( filename, env_vars ):
-  """
-    render jinja2 template into XML
-  """
-  # build the j2 template
-  template = j2_env.get_template( filename )
-  # now merge the template with the vars
-  as_txt = template.render( env_vars )
-  # now convert the txt to XML
-  return etree.XML( as_txt )
 
 # -----------------------------------------------------------------------------
 
@@ -35,15 +10,16 @@ vlan_vars = {
   'number': '100'
 }
 
-cr8_vlan_xml = j2_to_xml( 'create-vlan.j2.xml', vlan_vars )
+# use a template and render the vars immediately:
+rpc = wlc.RpcMaker( 'SET', Template='vlan_create', TemplateVars=vlan_vars )
 
-trans = wlc.RpcMaker( 'SET', 'vlan-table' )
-trans.data = cr8_vlan_xml
-
-# now perform the transaction
-rpc = trans.as_xml
+# alternatively you can invoke the render method if you don't provide
+# TemplateVars in the constructor, for example:
+# >>>
+# vlan_vars['number'] = '200'
+# rpc.render( vlan_vars )
 
 print "Creating VLAN %s ..." % vlan_vars['name']
 
-r = wlc.rpc( rpc )
-
+# execute the RPC and return the result
+rsp = rpc()

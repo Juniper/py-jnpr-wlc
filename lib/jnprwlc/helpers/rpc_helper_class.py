@@ -45,12 +45,14 @@ class RpcHelper(object):
     for method, method_fn in helpers.items():
       self.Set( method, method_fn )
 
+  @property
   def Children(self):
     """
       returns a list of RpcHelper child names
     """
     return self._children.keys()
 
+  @property
   def Helpers(self):
     """
       returns a list of RpcHelper function names
