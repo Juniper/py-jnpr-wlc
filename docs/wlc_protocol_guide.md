@@ -46,23 +46,24 @@ A _complex_ RPC is one that contains further XML nodes within the target.  This 
 ````xml
 <TRANSACTION tid="4">
   <SESSION/>
-  <SET><VLAN-TABLE>
-    <VLAN number="100">
-      <VLAN-MEMBER-TABLE>
-        <VLAN-MEMBER enable-tagging="YES" vlan-tag="50" forward-igmp="NO" multicast-router="NO">
-          <PORT-REF type="PORT">
-            <PHYS-PORT-REF module="1" port="2"/>
-          </PORT-REF>
-        </VLAN-MEMBER>
-        <VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
-          <PORT-REF type="PORT">
-            <PHYS-PORT-REF module="1" port="3"/>
-          </PORT-REF>
-        </VLAN-MEMBER>
-      </VLAN-MEMBER-TABLE>
-    </VLAN>
-  </VLAN-TABLE>
-</SET>
+  <SET>
+    <VLAN-TABLE>
+      <VLAN number="100">
+        <VLAN-MEMBER-TABLE>
+          <VLAN-MEMBER enable-tagging="YES" vlan-tag="50" forward-igmp="NO" multicast-router="NO">
+            <PORT-REF type="PORT">
+              <PHYS-PORT-REF module="1" port="2"/>
+            </PORT-REF>
+          </VLAN-MEMBER>
+          <VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+            <PORT-REF type="PORT">
+              <PHYS-PORT-REF module="1" port="3"/>
+            </PORT-REF>
+          </VLAN-MEMBER>
+        </VLAN-MEMBER-TABLE>
+      </VLAN>
+    </VLAN-TABLE>
+  </SET>
 </TRANSACTION>
 ````
 
