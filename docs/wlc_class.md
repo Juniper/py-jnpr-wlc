@@ -29,5 +29,5 @@ Invoking the XML RPC can be done by either using the `rpc` metaprogramming attri
 rsp = wlc.rpc.get_vlan( name='default' )
 ````
 
-Or by using the `RpcMaker` mechanism.  Both of these techniques are further described
+Or by using the `RpcMaker` mechanism.  Both of these techniques are further described [here](metaprogramming.md).
 
