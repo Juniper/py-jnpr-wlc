@@ -20,6 +20,11 @@ Here is an example of retrieving information on a specific VLAN, using the `name
 resp = wlc.rpc.get_vlan( name="default" )
 ````
 
+Here is an example that is the same as the "save configuration" command:
+````python
+wlc.rpc.act_write_configuration()
+````
+
 # Complex RPC
 
 To perform complex RPcs, using the `RpcMaker` method.  The usage format for `RpcMaker` is as follows:
@@ -29,15 +34,29 @@ To perform complex RPcs, using the `RpcMaker` method.  The usage format for `Rpc
 Where:
    * `cmd` is one of ['set','get','get-stat','act','delete']
    * `target` is a known target defined by the API DTD files
-   * ``**kvargs`` are option key/value arguments
+   * ``**kvargs`` are option key/value arguments that become the attributes to the target
 
 There are two _well known_ kvargs:
    * `Template` idendifies a template file to use
    * `TemplateVars` is a dictionary of variables to render into the Template (optional)
 
-Any other kvargs are considered attributes to the `target` element.
+For example:
+````python
+vlan_vars = dict(
+  number = 100,
+  ports = [
+    dict(port=2, tag=50),
+    dict(port=3)
+  ]
+)
 
-The return value is an RpcMaker opject.  The rpc is callable; and in doing so will invite the RPC and return the result as an lxml Element.  See Examples below.
+rpc = wlc.RpcMaker('set', Template='vlan_set_ports', TemplateVars=vlan_vars )
+
+print "Settting ports on VLAN ..."
+rsp = rpc()
+````
+
+The return value is an RpcMaker opject.  As you can see from the above example, the rpc object is callable; and in doing so will invite the RPC and return the result as an lxml Element.  See Examples below.
 
 ## RpcMaker Properties
 
