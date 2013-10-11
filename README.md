@@ -7,7 +7,7 @@ The WLC XML API is not public, but can be made available to existing customers.
 
 # OVERVIEW
 
-  The Juniper Wireless LAN Controller products implement a comprehensive HTTP/s API using XML as the content-data.  This module provides a *metaprogramming* set of capabilities to fully utilize the API in any easy and consumable manner.  To proficiently use this API, you should be familiar with [XML](http://www.w3schools.com/xml/) and [XPath](http://www.w3schools.com/xpath/) expressions.  This module uses the 3rd-party [lxml](http://lxml.de/index.html) python module for XML processing.
+  The Juniper Wireless LAN Controller products implement a comprehensive XML-RPC API over HTTP/s.  This module provides a *metaprogramming* set of capabilities to fully utilize the API in any easy and consumable manner.  To proficiently use this API, you should be familiar with [XML](http://www.w3schools.com/xml/) and [XPath](http://www.w3schools.com/xpath/) expressions.  This module uses the 3rd-party [lxml](http://lxml.de/index.html) python module for XML processing.
   
   This module is developed and tested with Python 2.7.  If you are using another version and it works, please notify the maintainer.  If you are using another version and it does **not** work, please open an issue.
 
