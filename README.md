@@ -7,7 +7,7 @@ The WLC XML API is not public, but can be made available to existing customers.
 
 # OVERVIEW
 
-  The Juniper Wireless LAN Controller products implement a comprehensive HTTP/s API using XML as the content-data.  This module provides a *metaprogramming* set of capabilities to fully utilize the API in any easy and consumable manner.  To proficiently use this API, you should be familiar with [XML](http://www.w3schools.com/xml/) and [XPath](http://www.w3schools.com/xpath/) expressions.  This module uses the 3rd-party [lxml](http://lxml.de/index.html) python module for XML processing.
+  The Juniper Wireless LAN Controller products implement a comprehensive XML-RPC API over HTTP/s.  This module provides a *metaprogramming* set of capabilities to fully utilize the API in any easy and consumable manner.  To proficiently use this API, you should be familiar with [XML](http://www.w3schools.com/xml/) and [XPath](http://www.w3schools.com/xpath/) expressions.  This module uses the 3rd-party [lxml](http://lxml.de/index.html) python module for XML processing.
   
   This module is developed and tested with Python 2.7.  If you are using another version and it works, please notify the maintainer.  If you are using another version and it does **not** work, please open an issue.
 
@@ -26,7 +26,7 @@ wlc.open()
 # -----------------------------------------------------
 # Retrieve the current VLANs and display them.  The RPC
 # invocation here is metaprogramming.  The `rpc` object
-# metraprograms whatever comes afte.  The response is 
+# metraprograms whatever comes after.  The response is 
 # an lxml Element
 
 vlans = wlc.rpc.get_vlan()
@@ -93,23 +93,6 @@ wlc.close()
 
 ````
 
-## WLC Class Methods
-
-  There are really only three significant class methods: `open`, `execute`, and `close`.  open sets up the HTTP/s transport internals and verifies authentication credentials. close performs any necessary object cleanup. execute transmits an XML RPC and return back the XML response
-  
-  While you can use the `execute` method to perform RPC transactions, you will generally use
-  the `rpc` attribute to metaprogram so you don't need to hassle with a lot of XML generation.  If you
-  want to do all the hard lifting of building the complete XML transaction, you can either use the
-  class `execute` method, or make a call on the `rpc`, like so:
-  
-````
-  # Assume rpc_cmd is a complete WLC XML TRANSACTION.  The following two
-  # approaches are equivalent:
-  
-  rpc_rsp = wlc.rpc( rpc_cmd )
-  rpc_rsp = wlc.execute( rpc_cmd )
-````
-
 ## RPC METAPROGRAMMING
 
   You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
@@ -126,7 +109,7 @@ wlc.close()
     <attribs>: name=value pairs that are set within the <target> element
 ````    
 
-  For example, let's say that you want to perform the "GET" command on a "VLAN" target and set
+  For example, let's say that you want to perform the "GET" command on a "VLAN" target and assign
   the VLAN attribute 'name' to the value 'Jeremy'.  You would do the following:
   
 ````
@@ -153,7 +136,7 @@ wlc.close()
 
 ## EXCEPTIONS
 
-  This module provides an `RpcError` exception.  This exception will be raised if the RPC response is an `ERROR-RESP`.
+  This module provides an `RpcError` exception, which inherits from StandardError.  This exception will be raised if the RPC response is an `ERROR-RESP`.
   The `RpcError` encapsulates both the RPC command and RPC response attributes; both stored as lxml Element.  For 
   example usage, see [this](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/try_except.py).
   
@@ -167,4 +150,6 @@ wlc.close()
   Apache 2.0
 
 ## CONTRIBUTORS
-  Jeremy Schulman, @nwkautomaniac
+
+  * Jeremy Schulman, @nwkautomaniac
+  * Tim McCarthy
