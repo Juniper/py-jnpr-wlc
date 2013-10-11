@@ -167,5 +167,16 @@ print rpc
 ````
 ... and get the same results :-)
 
+## General Purpose Usage
 
+Sometime you need to create an RPC of general purpose, and `RpcMaker` is handy for those cases as well.  Let's say you want to change the login banner Message of the Day (MOTD).  That script would look like:
+````python
+rpc = wlc.RpcMaker('set')
+rpc.data = 'MOTD'
+rpc.data.text = "This is your login message, yo!"
 
+# execute the RPC
+rsp = rpc()
+````
+
+_Neato!_
