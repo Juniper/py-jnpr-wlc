@@ -146,6 +146,7 @@ Here is an example using the builin helper to save the configuration:
 wlc.ez.save_config()
 ````
 
+For more details on using the "EZ" framework, see [here](docs/ez_framework.md).
 ## LOGGING
 
 Each WLC instance can support transaction logging.  You can use this facility by assigning an open file to the WLC instance, for example:
