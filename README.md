@@ -129,7 +129,7 @@ wlc.close()
   If you need to a _complex_ RPC, i.e. one that has XML elements within the <target> element, then you can use
   the `RpcMaker` mechanism.  You will generally need to use this mechanism when you want to create 
   things (like a VLAN), or set things within other things (like ports within a VLAN).  There are some
-  examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.  I'd suggest starting with this [one](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/add_del_vlan_port.py).
+  examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.  I'd suggest starting with this [one](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/vlan_add_ports.py).
 
 
 ## LOGGING
