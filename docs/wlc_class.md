@@ -16,6 +16,9 @@ wlc = WLC( user='jeremy', host='192.168.56.191', password='logmein' )
 ````
 
 There are number of optional parameters; refer to the builtin docs.
+````python
+help( wlc )
+````
 
 Once you've created an instance of this class, you must invoke the `open()` method.  
 ````python
