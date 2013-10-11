@@ -53,6 +53,7 @@ illustrates the point:
 ````python
 from lxml import etree
 
+# use etree to convert the string to an XML element structure
 rpc_as_xml = etree.XML( rpc_as_str )
 
 resp = wlc.rpc( rpc_as_xml )
