@@ -4,8 +4,6 @@ from pprint import pprint as pp
 
 wlc = WLC_login()
 
-rpc = wlc.RpcMaker('set', Template='vlan_set_ports')
-
 vlan_vars = dict(
   number = 100,
   ports = [
@@ -14,7 +12,7 @@ vlan_vars = dict(
   ]
 )
 
-rpc.render( vlan_vars )
+rpc = wlc.RpcMaker('set', Template='vlan_set_ports', TemplateVars=vlan_vars )
 
 print "Settting ports on VLAN ..."
 # rsp = rpc()

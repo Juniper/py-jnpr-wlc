@@ -1,0 +1,25 @@
+<!-- This template is used to add or remove ports on a VLAN          -->
+<!--                                                                 -->
+<!-- VARIABLES:                                                      -->
+<!--    number: VLAN number                                          -->
+<!--    ports: Array of dict                                         -->
+<!--       port: port number                                         -->
+<!--       tag: tag number (optional)                                -->
+
+<VLAN-TABLE>
+  <VLAN number="{{ number }}">
+    <VLAN-MEMBER-TABLE>
+{% for port in ports %}
+{% if port['tag'] %}
+      <VLAN-MEMBER enable-tagging="YES" vlan-tag="{{ port['tag'] }}" forward-igmp="NO" multicast-router="NO">
+{% else %}
+      <VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+{% endif %}
+        <PORT-REF type="PORT">
+          <PHYS-PORT-REF module="1" port="{{ port['port'] }}"/>
+        </PORT-REF>
+      </VLAN-MEMBER>
+{% endfor %}
+    </VLAN-MEMBER-TABLE>
+  </VLAN>
+</VLAN-TABLE>

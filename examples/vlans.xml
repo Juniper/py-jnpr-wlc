@@ -1,0 +1,47 @@
+<GET-RESP response-type="FULL">
+<VLAN number="1" name="default" state="ACTIVE" tunnel-affinity="5">
+<VLAN-IP vrouter="local">
+<VLAN-IP-IF primary="NO" enabled="YES" address="66.129.246.74" netmask="255.255.255.192" in-acl-group="" out-acl-group="" dhcp-client="NO">
+<VLAN-DHCP-SERVER enabled="NO" startaddr="0.0.0.0" stopaddr="0.0.0.0" dns-pri="0.0.0.0" dns-sec="0.0.0.0" dns-name="" default-router="0.0.0.0"/>
+<VLAN-IP-SECURITY/>
+</VLAN-IP-IF>
+</VLAN-IP>
+<VLAN-MEMBER-TABLE>
+<VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+<PORT-REF type="PORT">
+<PHYS-PORT-REF module="1" port="1"/>
+</PORT-REF>
+</VLAN-MEMBER>
+<VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+<PORT-REF type="PORT">
+<PHYS-PORT-REF module="1" port="3"/>
+</PORT-REF>
+</VLAN-MEMBER>
+<VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+<PORT-REF type="PORT">
+<PHYS-PORT-REF module="1" port="4"/>
+</PORT-REF>
+</VLAN-MEMBER>
+<VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+<PORT-REF type="PORT">
+<PHYS-PORT-REF module="1" port="5"/>
+</PORT-REF>
+</VLAN-MEMBER>
+<VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+<PORT-REF type="PORT">
+<PHYS-PORT-REF module="1" port="6"/>
+</PORT-REF>
+</VLAN-MEMBER>
+<VLAN-MEMBER enable-tagging="NO" vlan-tag="0" forward-igmp="NO" multicast-router="NO">
+<PORT-REF type="PORT">
+<PHYS-PORT-REF module="1" port="7"/>
+</PORT-REF>
+</VLAN-MEMBER>
+</VLAN-MEMBER-TABLE>
+<VLAN-FDB aging-time="300">
+<VLAN-FDB-TABLE/>
+</VLAN-FDB>
+<VLAN-IGMP enabled="YES" proxy-report="YES" querier-enabled="NO" mrouter-solicitation="NO" igmp-version="2" mrsol-interval="30" query-interval="125" other-querier-interval="255" query-response-interval="100" last-member-query-interval="10" robustness-value="2"/>
+<VLAN-STP enabled="NO" instance="1"/>
+</VLAN>
+</GET-RESP>
