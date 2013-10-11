@@ -145,6 +145,26 @@ The contents of the log file are the XML commands and assocaited responses.  Eac
 
 ## TEMPLATING
 
+This module supports using Jinja2 templates in conjuction with the creation of complex RPCs.  Template files can be located in either the program's current working directory, or template directory for this module.  A configurable search-path option will be added as an enhancement. 
+
+There are a few options for using templates.  These are described in detail [here]().
+
+The following uses a template file `vlan_set_ports.xml` that happens to be stored in the module template directory.
+````python
+vlan_vars = dict(
+  number = 100,
+  ports = [
+    dict(port=2, tag=50),
+    dict(port=3)
+  ]
+)
+
+rpc = wlc.RpcMaker('set', Template='vlan_set_ports', TemplateVars=vlan_vars )
+
+print "Settting ports on VLAN ..."
+rsp = rpc()
+````
+
 
 ## EXCEPTIONS
 
