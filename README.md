@@ -98,42 +98,11 @@ wlc.close()
 
 ## RPC METAPROGRAMMING
 
-  You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
-  Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
-  having to maintain a static set of function bound to a specifc WLC release of code.
-  
-  For _simple_ XML RPCs, you can do following way:
+You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
+Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
+having to maintain a static set of function bound to a specifc WLC release of code.
 
-````  
-    rsp = wlc.rpc.<cmd>_<target>( <attribs> )
-    
-    <cmd>: get, act, delete
-    <target>: a target specified in the WLC XML DTD
-    <attribs>: name=value pairs that are set within the <target> element
-````    
-
-  For example, let's say that you want to perform the "GET" command on a "VLAN" target and assign
-  the VLAN attribute 'name' to the value 'Jeremy'.  You would do the following:
-  
-````
-  rsp = wlc.rpc.get_vlan( name="Jeremy" )
-````
-
-  Simple!  The return value, `rsp`, is an etree Element.  You can dump this to the screen for debugging:
-  
-```
-  from lxml import etree
-  
-  etree.tostring(rsp, pretty_print=True)
-```
-
-  A _simple_ RPC is one that doesn't contain any further XML beyond the <target> element.  
-  
-  If you need to a _complex_ RPC, i.e. one that has XML elements within the <target> element, then you can use
-  the `RpcMaker` mechanism.  You will generally need to use this mechanism when you want to create 
-  things (like a VLAN), or set things within other things (like ports within a VLAN).  There are some
-  examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.  I'd suggest starting with this [one](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/vlan_add_ports.py).
-
+For details on issuing [RPCs](docs/wlc_class.md) and [metaprogramming](docs/metaprogramming.md), refer to the embbedded links.  
 
 ## "EZ" MICROFRAMEWORK
 
