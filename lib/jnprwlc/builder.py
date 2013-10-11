@@ -2,6 +2,7 @@
 import re
 from lxml import etree
 from lxml.builder import E
+from jinja2 import Template
 
 TRANSACTIONS_LIST = ['GET','SET','ACT','DELETE']
 
@@ -46,6 +47,7 @@ class RpcMaker(object):
   @property
   def target(self):
       return self._target
+  
   @target.setter
   def target(self, value):
       value = value.upper() if value else None
@@ -61,10 +63,16 @@ class RpcMaker(object):
   @property
   def factory(self):
       return self._factory
+  
   @factory.setter
   def factory(self, value):
       self._factory = value
 
+  # ---------------------------------------------------------------------------
+  # property: data
+  #    enables the caller to set the data element as a tag-name (string) or
+  #    a native XML element
+  # --------------------------------------------------------------------------- 
 
   @property
   def data(self):
@@ -76,6 +84,27 @@ class RpcMaker(object):
       self._data = E(value)
     else:
       self._data = value
+  
+  # ---------------------------------------------------------------------------
+  # property: template
+  #   enales the caller to set the template attribute as a file-name (string)
+  #   or native jinja2 Template
+  # ---------------------------------------------------------------------------
+
+  @property
+  def template(self):
+    return self._template
+
+  @template.setter
+  def template(self, value):
+    if isinstance(value,str):
+      self._template = self.wlc.Template( value )
+    elif isinstance(value, Template):
+      self._template = value
+    elif value == None:
+      self._template = None
+    else:
+      raise RuntimeError("value must be template name or Template instance")
   
   # ===========================================================================
   #                                  CONSTRUCTOR
