@@ -149,7 +149,7 @@ This module supports using Jinja2 templates in conjuction with the creation of c
 
 There are a few options for using templates.  These are described in detail [here]().
 
-The following uses a template file `vlan_set_ports.xml` that happens to be stored in the module template directory.
+The following uses a template file [vlan_set_ports.xml](https://github.com/jeremyschulman/py-jnprwlc/blob/master/lib/jnprwlc/templates/vlan_set_ports.xml) that happens to be stored in the module template directory.
 ````python
 vlan_vars = dict(
   number = 100,
