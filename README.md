@@ -14,7 +14,7 @@ This module uses [lxml](http://lxml.de/index.html) for XML processing.  This mod
   
 This module is developed and tested with Python 2.7.  If you are using another version and it works, please notify the maintainer.  If you are using another version and it does **not** work, please open an issue.
 
-## Quick Example
+## EXAMPLE
 
 ````python
 from jnprwlc import WirelessLanController as WLC
