@@ -18,7 +18,7 @@ Here is an example of a TRANSACTION to retrieve information on vlans.  The comma
   </GET>
 </TRANSACTION>
 ````
-
+The transaction id value (tid attribute) is simply an incrementing number used by the application and simply echo'd back in the transaction response.
 # TARGETS
 
 Generally speaking, each target has identifying XML attributes.  To retrieve a _specific_ VLAN, one would set either the VLAN `name` or `number` attribute.  For example, to retrieve just the VLAN named "default":
