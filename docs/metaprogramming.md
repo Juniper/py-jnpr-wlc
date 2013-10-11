@@ -41,3 +41,20 @@ The return value is an RpcMaker opject.  The rpc is callable; and in doing so wi
 
 ## RpcMaker Properties
 
+An rpc object has the following properties you can access:
+   * `cmd`
+   * `target`
+   * `args`
+   * `data`
+   * `to_xml`
+
+#### cmd
+
+#### target
+
+#### args
+
+#### data
+
+#### to_xml
+
