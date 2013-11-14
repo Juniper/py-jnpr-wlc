@@ -1,5 +1,3 @@
-import pdb
-
 # python stdlib
 import subprocess
 import os
@@ -14,10 +12,10 @@ from lxml import etree
 import jinja2
 
 # local public modules
-from jnprwlc.helpers import RpcHelper, std_rpc_helpers
-from jnprwlc.factory import RpcFactory
-from jnprwlc.exception import RpcError
-from jnprwlc.builder import RpcMaker
+from .helpers import RpcHelper, std_rpc_helpers
+from .factory import RpcFactory
+from .exception import RpcError
+from .builder import RpcMaker
 
 # jnprwlc internal modules
 from ._rpc_meta import _RpcMetaExec
@@ -31,7 +29,6 @@ DEFAULT_TEMPLATE_PATH = ".:"+os.path.dirname(__file__)+"/templates"
 
 LOG_DBAR = '<!--' + '='*50 +'-->\n'
 LOG_SBAR = '<!--' + '-'*50 +'-->\n'
-
 
 # create a global Jinja2 environment
 

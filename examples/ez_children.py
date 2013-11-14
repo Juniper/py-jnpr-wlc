@@ -1,7 +1,7 @@
 import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
-from jnprwlc import WirelessLanController as WLC
+from jnpr.wlc import WirelessLanController as WLC
 
 # wlc = WLC_login()
 wlc = WLC(host='a',user='b',password='c')
