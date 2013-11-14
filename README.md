@@ -17,7 +17,7 @@ This module is developed and tested with Python 2.7.  If you are using another v
 ## EXAMPLE
 
 ````python
-from jnprwlc import WirelessLanController as WLC
+from jnpr.wlc import WirelessLanController as WLC
 
 wlc = WLC( user='jeremy', host='192.168.10.27', password='logmeIn' )
 

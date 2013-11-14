@@ -10,7 +10,7 @@ The first step is to create an instance of this class.  The only required parame
   * password
 
 ````python
-from jnprwlc import WirelessLanController as WLC
+from jnpr.wlc import WirelessLanController as WLC
 
 wlc = WLC( user='jeremy', host='192.168.56.191', password='logmein' )
 ````
