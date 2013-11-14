@@ -6,6 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "jnpr-wlc",
+    namespace_packages = ['jnpr'],
     version = "0.0.1",
     author = "Jeremy Schulman",
     author_email = "jschulman@juniper.net",
