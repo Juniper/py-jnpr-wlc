@@ -1,18 +1,34 @@
 
+WORK IN PROGRESS
+
 =======
 # Juniper WLC Protocol Guide
 
-The WL solution utilizes an XML over HTTPS protocol to communicate with WLC and WLA devices. The protocol is based on a set of transactions where the transaction syntax is defined by a DTD. The DTD can be found in a seperate repo at the Juniper Networks GitHub site. A list of transactions such as GET, SET, DELETE, and ACTION are supported by the WLC and are used to configure and monitor both the WLC WLAN controllers as well as the WLA Access Points (by proxy through the WLC).
+The WL solution utilizes an XML over HTTPS protocol to communicate with WLC and WLA devices. The protocol is based on a set of transactions where the transaction syntax is defined by a DTD. The DTD can be found in a separate repo at the Juniper Networks GitHub site. A list of transactions such as GET, SET, DELETE, and ACTION are supported by the WLC and are used to configure and monitor both the WLC WLAN controllers as well as the WLA Access Points (by proxy through the WLC).
 
-[add intro text about who uses the interface and why]
+This interface is an integral part of the WLC system software which provides the basis for device management. The Juniper WLAN management tools (RingMaster and Network Director) leverage this interface to perform all system configuration and monitoring activities. 
+
+Basic terminology used when working with the Juniper WLC xml api:
+
+  - DP = MX = WLC: The WLAN controller in the Juniper system has used several internal naming conventions. These are are all different labels for the WLC. 
+  - MP = AP = WLA: Access Points in the WL Solution have also used several different names. These are all label for Access Points in the solution. 
+  - Jumppad = RingMaster: These are alternate names for the legacy Trapeze Networks network management tools. This tool is a major consumer of the xml interface.
+  - Network Director: This is the Juniper Networks Junos Space based platform for WLC network management.
+  
 
 ## Connecting to the WLC
 
-[https port 8889, link to config guide, basic auth, usernames/passwords, config logging on WLC, tracing, etc]
+The WLC management protocol uses standard https for transport with xml transactions passed over the secure channel. A WLC can have multiple IP addresses and any of these is acceptable for management, however, some reposes will reference the IP of the WLC using the administratively configured "system ip". Where possible, this is the preferred address to contact the WLC on. Connections are established to the WLC on port 8889 by default, but the WLC administrator can modify this as necessary. 
 
-[should probably use the system IP although not strictly required]
+Connection security is via HTTP Basic Auth, where username and password are the "enable" credentials used to access the device via the CLI. The auth mode of the https server can be modified to allow per-user login credentials with individual authentication for each connection. Details on WLC configuration can be found [here.](http://www.juniper.net/techpubs/en_US/release-independent/wireless/information-products/pathway-pages/wireless-lan/index.html)
 
--admin certificates
+The connection uses a server side certificate to establish security, by default, the WLC uses a self-signed vert on the device for this. The user may change the device vert via the WLC CLI. Please refer to the WLC Mobility System Software User Guide. 
+
+
+Example connection with Curl
+
+````curl -v -k --basic -u session:admin -X POST -d 'XML=<TRANSACTION tid="1" ><GET><VLAN number="1"/></GET></TRANSACTION>' https://172.16.1.2:8889/trapeze/ringmaster
+````
 
 
 ## Transactions
@@ -45,7 +61,7 @@ GET operation is used by retrieving or querying a list of information for exampl
 
 ### GET-STAT Operations
 
-GET-STAT operations are a speccial case of GET operations used for collecting device statistics. 
+GET-STAT operations are a special case of GET operations used for collecting device statistics. 
 
 
 ### SET Operations
@@ -139,7 +155,7 @@ Generally speaking, each target has identifying XML attributes.  To retrieve a _
 ````
 ### Simple vs Complex RPC
 
-A _simple_ RPC is one that contains only a target element and associated attributes.  For example, retrieveing information on a specific VLAN is considered a simple RPC:
+A _simple_ RPC is one that contains only a target element and associated attributes.  For example, retrieving information on a specific VLAN is considered a simple RPC:
 ````xml
 <TRANSACTION tid="4">
   <SESSION/>
