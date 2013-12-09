@@ -17,7 +17,7 @@ This module is developed and tested with Python 2.7.  If you are using another v
 ## EXAMPLE
 
 ````python
-from jnprwlc import WirelessLanController as WLC
+from jnpr.wlc import WirelessLanController as WLC
 
 wlc = WLC( user='jeremy', host='192.168.10.27', password='logmeIn' )
 
@@ -98,43 +98,24 @@ wlc.close()
 
 ## RPC METAPROGRAMMING
 
-  You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
-  Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
-  having to maintain a static set of function bound to a specifc WLC release of code.
-  
-  For _simple_ XML RPCs, you can do following way:
+You can issue WLC XML RPCs in a few different ways.  These methods use Python metaprogramming techniques.  
+Metapgramming means the this module automatically generates the XML RPC commands on-the-fly without
+having to maintain a static set of function bound to a specifc WLC release of code.
 
-````  
-    rsp = wlc.rpc.<cmd>_<target>( <attribs> )
-    
-    <cmd>: get, act, delete
-    <target>: a target specified in the WLC XML DTD
-    <attribs>: name=value pairs that are set within the <target> element
-````    
+For details on issuing [RPCs](docs/wlc_class.md) and [metaprogramming](docs/metaprogramming.md), refer to the embbedded links.  
 
-  For example, let's say that you want to perform the "GET" command on a "VLAN" target and assign
-  the VLAN attribute 'name' to the value 'Jeremy'.  You would do the following:
-  
-````
-  rsp = wlc.rpc.get_vlan( name="Jeremy" )
+## "EZ" MICROFRAMEWORK
+
+Each WLC object has an `ez` attribute that can be used to attach helper functions or packages.  The purpose of these functions is provide natural Python language bindings around the WLC XML API so that the results are not XML, but native types, like dictionaries.
+
+There are a few _builtin_ helper functions that are autoinstalled as part of every WLC object.  For details, refer to the [helpers](lib/jnprwlc/helpers) directory.
+
+Here is an example using the builin helper to save the configuration:
+````python
+wlc.ez.save_config()
 ````
 
-  Simple!  The return value, `rsp`, is an etree Element.  You can dump this to the screen for debugging:
-  
-```
-  from lxml import etree
-  
-  etree.tostring(rsp, pretty_print=True)
-```
-
-  A _simple_ RPC is one that doesn't contain any further XML beyond the <target> element.  
-  
-  If you need to a _complex_ RPC, i.e. one that has XML elements within the <target> element, then you can use
-  the `RpcMaker` mechanism.  You will generally need to use this mechanism when you want to create 
-  things (like a VLAN), or set things within other things (like ports within a VLAN).  There are some
-  examples of using `RpcMaker` in the [example](https://github.com/jeremyschulman/py-jnprwlc/tree/master/examples) directory.  I'd suggest starting with this [one](https://github.com/jeremyschulman/py-jnprwlc/blob/master/examples/vlan_add_ports.py).
-
-
+For more details on using the "EZ" framework, see [here](docs/ez_framework.md).
 ## LOGGING
 
 Each WLC instance can support transaction logging.  You can use this facility by assigning an open file to the WLC instance, for example:

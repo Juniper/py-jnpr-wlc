@@ -5,22 +5,7 @@ ___WORK IN PROGRES___
 =======
 # Juniper WLC Protocol Guide
 
-The WL solution utilizes an XML over HTTPS protocol to communicate with WLC and WLA devices. The protocol is based on a set of transactions where the transaction syntax is defined by a DTD. The DTD can be found in a seperate repo at the Juniper Networks GitHub site. A list of transactions such as GET, SET, DELETE, and ACTION are supported by the WLC and are used to configure and monitor both the WLC WLAN controllers as well as the WLA Access Points (by proxy through the WLC).
-
-[add intro text about who uses the interface and why]
-
-## Connecting to the WLC
-
-[https port 8889, link to config guide, basic auth, usernames/passwords, config logging on WLC, tracing, etc]
-
-[should probably use the system IP although not strictly required]
-
--admin certificates
-
-
-## Transactions
-
-[more intro to transactions]
+The WL solution utilizes an XML over HTTPS protocol to communicate with WLC and WLA devices. The protocol is based on a set of transactions where the transaction syntax is defined by a DTD. The DTD can be found here [tim: add reference]. A list of transactions such as GET, SET, DELETE, and ACTION are supported by the WLC and are used to configure and monitor both the WLC WLAN controllers as well as the WLA Access Points (by proxy through the WLC).
 
 Some basic rules of the WLC transactions:
 
@@ -31,7 +16,7 @@ Some basic rules of the WLC transactions:
 
 
 
-### GET Operations
+### GET Operation
 
 GET operation is used by retrieving or querying a list of information for example configuration data, device status and statistics. For example, the following request is sent to a device for querying of a boot status of a system.
 
@@ -46,12 +31,7 @@ GET operation is used by retrieving or querying a list of information for exampl
     </TRANSACTION>
 ````
 
-### GET-STAT Operations
-
-GET-STAT operations are a speccial case of GET operations used for collecting device statistics. 
-
-
-### SET Operations
+### SET Operation
 
 SET operation is used to perform modifying attributes of an object, or creating an object. If the SET target does not exist, the operation is assumed to be a “create” operation. For example, the following transaction creates a RADIUS-SERVER-GROUP on the device.
 
@@ -72,9 +52,9 @@ SET operation is used to perform modifying attributes of an object, or creating 
     </TRANSACTION>
 ````
 
-### DELETE Operations
+### DELETE Operation
 
-There is no implicit deletes. Any DELETES need to be included in an `ACTION` transaction. For example,
+There is no implicit deletes. Any DELETES need to be included in a transaction. For example,
 
 ````xml
 <TRANSACTION tid="32">
@@ -93,7 +73,7 @@ There is no implicit deletes. Any DELETES need to be included in an `ACTION` tra
 </TRANSACTION>
 ````
 
-### ACTION Operations
+### ACTION Operation
 
 ACTION Operation is used to perform one time action on the device, and it does not persist in the configuration data on the device. For example, reboot a device, reboot an AP, finding a client are all possible one time action performed on the device.
 
