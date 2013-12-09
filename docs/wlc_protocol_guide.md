@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-___WORK IN PROGRES___
 
-# COMMAND SET
 =======
 # Juniper WLC Protocol Guide
 
@@ -108,7 +105,6 @@ ACTION Operation is used to perform one time action on the device, and it does n
 ````
 
 ## COMMAND SET
->>>>>>> 7389d6608ac7c4e454396a31b1a55f9ee8bf759e
 
 XML RPC are executed as a `TRANSACTION`.  Within the TRANSACTION there is a toplevel command element, one of:
   
