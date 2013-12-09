@@ -27,7 +27,9 @@ The connection uses a server side certificate to establish security, by default,
 
 Example connection with Curl
 
-````curl -v -k --basic -u session:admin -X POST -d 'XML=<TRANSACTION tid="1" ><GET><VLAN number="1"/></GET></TRANSACTION>' https://172.16.1.2:8889/trapeze/ringmaster
+````
+curl -v -k --basic -u session:admin -X POST -d 'XML=<TRANSACTION tid="1" ><GET><VLAN number="1"/></GET></TRANSACTION>' https://172.16.1.2:8889/trapeze/ringmaster
+
 ````
 
 
