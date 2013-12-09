@@ -3,7 +3,7 @@ import re
 from lxml import etree
 from lxml.builder import E
 
-TRANSACTIONS_LIST = ['GET','SET','ACT','DELETE']
+TRANSACTIONS_LIST = ['GET', 'GET-STAT', 'SET','ACT','DELETE']
 
 class RpcMaker(object):
 
