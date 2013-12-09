@@ -4,7 +4,7 @@ from lxml import etree
 from lxml.builder import E
 from jinja2 import Template
 
-TRANSACTIONS_LIST = ['GET','SET','ACT','DELETE']
+TRANSACTIONS_LIST = ['GET', 'GET-STAT', 'SET','ACT','DELETE']
 
 class RpcMaker(object):
 
