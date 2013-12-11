@@ -58,7 +58,7 @@ GET operation is used by retrieving or querying a list of information for exampl
                 <BOOTSTATUS/>
             </SYSINFO>
         </GET>
-    </TRANSACTION>
+    </TRANSACTION>    
 ````
 
 ### GET-STAT Operations

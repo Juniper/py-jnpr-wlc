@@ -3,17 +3,13 @@ import demowlcutils
 from demowlcutils import ppxml, WLC_login
 from pprint import pprint as pp 
 from lxml.builder import E
-from jnprwlc import WirelessLanController as WLC
-
-
-wlc = WLC_login()
-
-mac = '10:40:f3:e6:fc:26'
-#mac = '88:53:95:2a:d4:37'
+from jnpr.wlc import WirelessLanController as WLC
 
 
 ##### -------------------------------------------------------------------------
-####  add the 'find_client' as an "ez" helper function
+####  add the 'find_client' as an "ez" helper function. the find client call
+####  allows searching for active sessions by mac, ip and name. This command 
+####  does not have an equivalent CLI command. 
 ##### -------------------------------------------------------------------------
 
 def find_client( wlc, *vargs, **kvargs ):
@@ -65,6 +61,12 @@ def find_client( wlc, *vargs, **kvargs ):
     return ret_data
 
 
+##### -------------------------------------------------------------------------
+####  add 'clear_client' as an "ez" helper function. This is the same as the 
+####  'clear session' CLI command except that we have an option to also add 
+####  the client to the rfdetect dynamic blacklist.
+##### -------------------------------------------------------------------------
+
 def clear_client( wlc, *vargs, **kvargs ):
     """
         clear client sessions from the WLC
@@ -82,6 +84,11 @@ def clear_client( wlc, *vargs, **kvargs ):
     return rpc()
 
 
+##### -------------------------------------------------------------------------
+####  add 'get_clients' as an "ez" helper function. This is the same as the 
+####  'show sessions' CLI command.
+##### -------------------------------------------------------------------------
+
 def get_clients( wlc, *vargs, **kvargs ):
     """
         create a single dictionary containing information
@@ -93,7 +100,7 @@ def get_clients( wlc, *vargs, **kvargs ):
     for session in rsp.findall('.//USER-SESSION-STATUS'):                        
         locstat = session.find('.//USER-LOCATION-MEMBER')
 
-        ret_data[session.get('mac-addr')] = dict(session.attrib)   # copy the attributes into a dictionary
+        ret_data[session.get('mac-addr')] = dict(session.attrib)  
         ret_data[session.get('mac-addr')].update(locstat.attrib) 
 
     return ret_data
@@ -104,50 +111,9 @@ def get_clients( wlc, *vargs, **kvargs ):
 ##### -------------------------------------------------------------------------
 
 # add new routines to the WLC "ez" section.
-wlc.ez( helper=find_client)
-wlc.ez( helper=clear_client)
-wlc.ez( helper=get_clients)
+# wlc.ez( helper=find_client)
+# wlc.ez( helper=clear_client)
+# wlc.ez( helper=get_clients)
 
-# now call the service by mac
-print "Finding user session by mac..."
-client = wlc.ez.find_client( macaddress = mac )
-
-# show the info:
-pp(client)
-
-print "Finding user session by ip..."
-client = wlc.ez.find_client( ipaddress = client[mac]['ip-addr'] )
-
-# show the info:
-pp(client)
-
-print "Finding user session by name..."
-client = wlc.ez.find_client( username = client[mac]['user-name'] )
-
-# show the info:
-pp(client)
-
-# Execute the clear client function against the session id we discovered in the find.
-# The Blacklist flag will terminate the user session and add the mac to the dynamic
-# rfedetect blacklist table.
-print "Clearing session id..."
-wlc.ez.clear_client( sessionid = client[mac]['session-id'], blacklist = 'NO' )
-print "Done"
-
-print "Get current sessions..."
-clients = wlc.ez.get_clients()
-
-print "User Name             SessID  Type  Address              VLAN            AP/Rdo"
-print "--------------------- ------  ----- -------------------- --------------  -------"
-
-for client in clients:
-    print('%-21s %-6s  %-5s %-20s %-14s  %-s/%-s' % (
-        clients[client]['user-name'][:20], 
-        clients[client]['local-id'],
-        clients[client]['access-type'][-5:],
-        clients[client]['ip-addr'],
-        clients[client]['vlan-name'],
-        clients[client]['dap'],
-        clients[client]['ap-radio'] ))
 
 
