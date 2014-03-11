@@ -18,20 +18,18 @@ euclid_ip = '23.23.125.65'
 
 
 snoop_filter_j2 = Template(u"""
-  <SNOOP-FILTER-TABLE>
-    <SNOOP-FILTER name="EuclidConnector" enable="YES">
+    <SNOOP-FILTER name="Euclid-{{ euclidtype }}" enable="YES">
       <SNOOP-OBSERVER-REF target="{{ ip }}"/>
       <SNOOP-CONDITION>
         <SNOOP-CONDITION-DIRECTION operation="EQ" direction="RECEIVE"/>
       </SNOOP-CONDITION>
       <SNOOP-CONDITION>
-        <SNOOP-CONDITION-FRAME-TYPE operation="EQ" frame-type="PROBE"/>
+        <SNOOP-CONDITION-FRAME-TYPE operation="EQ" frame-type="{{ euclidtype }}"/>
       </SNOOP-CONDITION>
       <SNOOP-CONDITION>
         <SNOOP-CONDITION-TRANSMITTER-TYPE operation="NEQ" transmitter-type="MEMBER-AP"/>
       </SNOOP-CONDITION>
     </SNOOP-FILTER>
-  </SNOOP-FILTER-TABLE>
   """)
   
   
@@ -56,14 +54,19 @@ rp = config.find(".//RADIO-PROFILE[@name='%s']" % (radioprofile))
 
 
 # create the NSYSTEM object and add our snoop settings
-rpc.data = E('NSYSTEM')
-rpc.data.append(etree.XML(snoop_filter_j2.render( ip=euclid_ip )))
+rpc.data = E('NSYSTEM') 
+filtertable = E('SNOOP-FILTER-TABLE')
+for filtertype in ['PROBE', 'DATA']:
+  filtertable.append(etree.XML(snoop_filter_j2.render( ip=euclid_ip, euclidtype=filtertype)))
+rpc.data.append(filtertable)
 rpc.data.append(etree.XML(snoop_observer_j2.render( ip=euclid_ip )))
 
 
 # create the Snoop filter mapping and add it to the existing radio profile config
-rp.append(E('SNOOP-FILTER-REF', {'name':'EuclidConnector'}))
+rp.append(E('SNOOP-FILTER-REF', {'name':'Euclid-PROBE'}))
+rp.append(E('SNOOP-FILTER-REF', {'name':'Euclid-DATA'}))
 rpc.data.append(rp)
+
 
 r = rpc()
 
