@@ -1,6 +1,7 @@
 # python stdlib
 import subprocess
 import os
+import sys
 from urllib2 import Request
 from urllib2 import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
 from urllib2 import HTTPHandler, HTTPSHandler, build_opener
@@ -203,17 +204,21 @@ class WirelessLanController(object):
       attempts to ping the WLC device.  This only works on Unix systems that 
       has /bin/ping
     """
-    if os.uname()[0] == 'Linux':
+    if 'linux' in sys.platform:
       ping = subprocess.Popen(
         ["/bin/ping", "-c1", "-w"+str(self._timeout), self._hostname],
         stdout=subprocess.PIPE) 
-    elif os.uname()[0] == 'Darwin':
+    elif 'darwin' in sys.platform:
       ping = subprocess.Popen(
         ["/sbin/ping", "-c1", "-W"+str(self._timeout), self._hostname],
         stdout=subprocess.PIPE)  
-         
+    else:
+      # skip the ping check for windows machines
+      raise RuntimeError("Ping test not supported on this OS (%s)." % (sys.platform))
+
     if 0 != ping.wait():
       raise RuntimeError("Unable to ping host: " + self._hostname)
+
 
   ### ---------------------------------------------------------------------------
   ### open(): sets up HTTP transport and verifies reachablility
@@ -230,7 +235,10 @@ class WirelessLanController(object):
     """
 
     self._setup_http()
-    self._ping_test()
+    # skip the ping check for windows users
+    # XXX this should be fixed
+    if 'win' not in sys.platform:
+      self._ping_test()
 
     self.ez.facts()
     return self.facts
