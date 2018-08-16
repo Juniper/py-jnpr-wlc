@@ -126,7 +126,7 @@ The contents of the log file are the XML commands and assocaited responses.  Eac
 
 ## TEMPLATING
 
-This module supports using Jinja2 templates in conjuction with the creation of complex RPCs.  Template files can be located in either the program's current working directory, or template directory for this module.  A configurable search-path option will be added as an enhancement. 
+This module supports using Jinja2 templates in conjunction with the creation of complex RPCs.  Template files can be located in either the program's current working directory, or template directory for this module.  A configurable search-path option will be added as an enhancement. 
 
 There are a few options for using templates.  These are described in detail [here]().
 
